@@ -10,7 +10,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#28141d" />
+    <meta name="theme-color" content="#14251f" />
     <meta name="description" content="Descubre la colección de licores y cremas artesanales de ChachaWillka. Haz tu pedido para recojo en Chachapoyas." />
     <title>@ViewData["Title"] — ChachaWillka</title>
     <link rel="icon" type="image/jpeg" href="~/images/chachawillka/instagram-perfil.jpg" />
@@ -18,6 +18,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&amp;display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @if (portada)
+    {
+        <link rel="stylesheet" href="~/css/escaparate.css" asp-append-version="true" />
+        <script src="~/js/escaparate.js" asp-append-version="true" defer></script>
+    }
     <script src="~/js/site.js" asp-append-version="true" defer></script>
 </head>
 <body class="@(portada ? "es-portada" : "")">
@@ -25,11 +30,12 @@
     <header class="cabecera">
         <div class="marco cabecera-interior">
             <a class="marca" asp-controller="Home" asp-action="Index" aria-label="ChachaWillka, inicio">Chacha<i>Willka</i><span>.</span></a>
-            <nav class="navegacion" aria-label="Navegación principal">
+            <nav class="navegacion" id="menu-principal" aria-label="Navegación principal">
                 <a asp-controller="Home" asp-action="Index" asp-fragment="coleccion">Colección</a>
                 @if (!personal)
                 {
                     <a class="nav-cajas" asp-controller="Home" asp-action="Index" asp-fragment="cajas">Cajas</a>
+                    <a asp-controller="Home" asp-action="Index" asp-fragment="recojo">Recojo</a>
                 }
                 @if (User.IsInRole(RolesTienda.Administrador))
                 {
@@ -45,6 +51,7 @@
                 }
             </nav>
             <div class="cuenta-nav">
+                <button type="button" class="menu-movil" aria-expanded="false" aria-controls="menu-principal" hidden>Menú</button>
                 @if (User.Identity?.IsAuthenticated == true)
                 {
                     <a class="boton-sesion" asp-controller="Login" asp-action="Cuenta">Mi cuenta</a>

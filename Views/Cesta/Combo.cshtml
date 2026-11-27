@@ -20,6 +20,12 @@
                 <p>@(Model.Repeticiones ? "Puedes repetir sabores si hay unidades disponibles." : "Elige cuatro sabores distintos.")</p>
                 <form asp-action="AgregarCombo" method="post" class="formulario" data-combo data-repeticiones="@Model.Repeticiones.ToString().ToLowerInvariant()">
                     <input type="hidden" name="categoria" value="@Model.Categoria" />
+                    <div class="bandeja" data-bandeja hidden aria-hidden="true">
+                        @for (var i = 1; i <= 4; i++)
+                        {
+                            <div class="hueco"><span>@i.ToString("00")</span></div>
+                        }
+                    </div>
                     <div class="selecciones">
                         @for (var i = 1; i <= 4; i++)
                         {
@@ -28,7 +34,8 @@
                                 <option value="">Seleccionar</option>
                                 @foreach (var producto in Model.Productos)
                                 {
-                                    <option value="@producto.Id_Producto">@producto.Nombre</option>
+                                    <option value="@producto.Id_Producto" data-unidades="@producto.Disponible"
+                                            data-foto="@(string.IsNullOrWhiteSpace(producto.Imagen) ? null : Url.Content("~/images/chachawillka/" + producto.Imagen))">@producto.Nombre</option>
                                 }
                             </select></div>
                         }

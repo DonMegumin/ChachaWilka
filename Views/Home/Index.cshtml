@@ -3,94 +3,49 @@
     ViewData["Title"] = "Licores y cremas de Chachapoyas";
     ViewData["Portada"] = true;
     var personal = User.IsInRole(RolesTienda.Administrador) || User.IsInRole(RolesTienda.Empleado);
+    var cajas = new[] {
+        (Nombre: "Licores", Foto: "caja-licores.webp", Precio: Model.Ajustes.PrecioCombo),
+        (Nombre: "Cremas", Foto: "caja-cremas.webp", Precio: Model.Ajustes.PrecioComboCremas)
+    }.Where(c => c.Precio > 0).ToArray();
 }
-<section class="hero">
-    <div class="marco hero-interior">
-        <div class="hero-texto">
-            <p class="origen"><i></i> Chachapoyas, Amazonas</p>
-            <h1>El monte,<br />en <em>botella.</em></h1>
-            <p class="hero-bajada">Licores macerados y cremas artesanales. Elige tus sabores y recoge tu pedido en Chachapoyas.</p>
-            <a class="boton boton-lima" href="#coleccion">Explorar la colección <span aria-hidden="true">↘</span></a>
+<partial name="_Escena" />
+<partial name="_Coleccion" model="Model" />
+<p class="solo-lectura" data-resultado role="status"></p>
+<dialog class="ficha" aria-labelledby="ficha-nombre" data-ficha>
+    <div class="ficha-interior">
+        <div class="ficha-foto" data-ficha-foto></div>
+        <div class="ficha-texto">
+            <p class="detalle-categoria" data-ficha-categoria></p>
+            <h2 id="ficha-nombre"></h2>
+            <p data-ficha-descripcion></p>
+            <div class="producto-acciones" data-ficha-acciones></div>
         </div>
-        <figure class="hero-foto">
-            <img src="~/images/chachawillka/combo-licores.jpg" alt="Botellas de ChachaWillka con su caja de presentación" width="640" height="794" fetchpriority="high" />
-            <figcaption><span>CHACHAWILLKA</span><span>LICORES Y CREMAS</span></figcaption>
-        </figure>
+        <form method="dialog"><button type="submit" class="cerrar-ficha" aria-label="Cerrar ficha" autofocus>×</button></form>
     </div>
-</section>
-<div class="cinta">
-    <div class="marco cinta-interior"><span>Elaboración artesanal</span><span aria-hidden="true">✦</span><span>Recojo en Chachapoyas</span><span aria-hidden="true">✦</span><span>Pago por Yape</span></div>
-</div>
-
-<section class="marco seccion coleccion" id="coleccion" aria-labelledby="coleccion-titulo">
-    <div class="seccion-cabecera">
-        <div>
-            <h2 id="coleccion-titulo">La colección</h2>
-            <p>Encuentra tu sabor entre nuestros licores y cremas.</p>
-        </div>
-        <nav class="filtros" aria-label="Filtrar colección">
-            <a asp-action="Index" asp-fragment="coleccion" aria-current="@(Model.Categoria == null ? "true" : null)">Todos</a>
-            <a asp-action="Index" asp-route-categoria="Licores" asp-fragment="coleccion" aria-current="@(Model.Categoria == "Licores" ? "true" : null)">Licores</a>
-            <a asp-action="Index" asp-route-categoria="Cremas" asp-fragment="coleccion" aria-current="@(Model.Categoria == "Cremas" ? "true" : null)">Cremas</a>
-        </nav>
-    </div>
-    @if (!Model.Disponible)
-    {
-        <p class="nota">Puedes explorar la colección. La cesta volverá a estar disponible cuando se restablezca la conexión con la tienda.</p>
-    }
-    @if (Model.Productos.Count == 0)
-    {
-        <p class="vacio">Por ahora no hay productos en esta colección.</p>
-    }
-    <div class="productos">
-        @foreach (var producto in Model.Productos)
-        {
-            <article class="producto">
-                <div class="producto-foto">
-                    @if (!string.IsNullOrWhiteSpace(producto.Imagen))
-                    {
-                        <img src="~/images/chachawillka/@producto.Imagen" alt="@producto.Nombre" width="640" height="585" loading="lazy" />
-                    }
-                    else
-                    {
-                        <span class="marca marca-sola" aria-hidden="true">Chacha<i>Willka</i></span>
-                    }
-                </div>
-                <div class="producto-texto">
-                    <p class="detalle-categoria">@(producto.Categorias?.Nombre_Categoria ?? producto.Categoria)</p>
-                    <h3>@producto.Nombre</h3>
-                    <p>@producto.Descripcion</p>
-                    <div class="producto-acciones">
-                        <strong>S/ @producto.Precio.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)</strong>
-                        @if (Model.Disponible && producto.Disponible > 0 && !personal)
-                        {
-                            <form asp-controller="Cesta" asp-action="Agregar" method="post">
-                                <input type="hidden" name="id" value="@producto.Id_Producto" />
-                                <input type="hidden" name="categoria" value="@Model.Categoria" />
-                                <button type="submit" class="boton-redondo" aria-label="Añadir @producto.Nombre a la cesta" title="Añadir a la cesta">+</button>
-                            </form>
-                        }
-                        else if (Model.Disponible && producto.Disponible <= 0)
-                        {
-                            <span class="stock">Sin stock</span>
-                        }
-                    </div>
-                </div>
-            </article>
-        }
-    </div>
-</section>
-
+</dialog>
 <section class="cajas" id="cajas" aria-labelledby="cajas-titulo">
     <div class="marco seccion">
         <div class="seccion-cabecera">
-            <div><h2 id="cajas-titulo">De cuatro en cuatro.</h2><p>Elige cuatro sabores de una misma colección y arma tu caja.</p></div>
+            <div><h2 id="cajas-titulo">Cuatro sabores,<br /><em>una caja.</em></h2><p>Elige cuatro sabores de una misma colección y arma tu caja.</p>
+                @if (cajas.Length > 1)
+                {
+                    <nav class="indice-cajas" aria-label="Presentaciones de caja">
+                        @foreach (var caja in cajas)
+                        {
+                            <a href="#caja-@caja.Nombre.ToLowerInvariant()">@caja.Nombre</a>
+                        }
+                    </nav>
+                }
+            </div>
         </div>
         <div class="cajas-lista">
-            @foreach (var caja in new[] { (Nombre: "Licores", Foto: "caja-licores.webp", Precio: Model.Ajustes.PrecioCombo), (Nombre: "Cremas", Foto: "caja-cremas.webp", Precio: Model.Ajustes.PrecioComboCremas) })
+            @if (cajas.Length == 0)
             {
-                @if (caja.Precio <= 0) { continue; }
-                <article class="caja">
+                <p>Por el momento no hay cajas disponibles.</p>
+            }
+            @foreach (var caja in cajas)
+            {
+                <article class="caja" id="caja-@caja.Nombre.ToLowerInvariant()">
                     <img src="~/images/chachawillka/@caja.Foto" alt="Ejemplo de una caja ChachaWillka con cuatro botellas de @caja.Nombre.ToLowerInvariant()" width="1200" height="800" loading="lazy" />
                     <div>
                         <h3>Caja de @caja.Nombre.ToLowerInvariant()</h3>
