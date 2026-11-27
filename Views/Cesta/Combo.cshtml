@@ -9,6 +9,7 @@
 <section class="marco pagina configurar-caja">
     <a class="regreso" asp-controller="Home" asp-action="Index" asp-fragment="cajas">← Volver a las cajas</a>
     <header class="configurar-cabecera">
+        <img class="configurar-foto" src="~/images/chachawillka/@fotoCaja" alt="" width="1200" height="800" />
         <div>
             <h1>Caja de @nombre</h1>
             <p>@(Model.Repeticiones ? "Elige cuatro botellas. Puedes repetir sabores si hay existencias." : "Elige cuatro sabores distintos para tu caja.")</p>

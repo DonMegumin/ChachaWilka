@@ -5,14 +5,14 @@
     var puedeComprar = User.IsInRole(RolesTienda.Cliente);
 }
 <section class="marco pagina pagina-cesta">
-    <a class="regreso" asp-controller="Home" asp-action="Index" asp-fragment="coleccion">← Seguir explorando</a>
+    <a class="regreso" asp-controller="Home" asp-action="Coleccion">← Seguir explorando</a>
     <h1>Tu cesta</h1>
     @if (Model.Carrito.Cantidad == 0)
     {
         <div class="cesta-vacia">
             <img src="~/images/chachawillka/combo-licores-2.jpg" alt="La colección de licores ChachaWillka" width="640" height="383" />
             <div><h2>Tu cesta está vacía.</h2><p>Elige un licor, una crema o arma tu propia caja.</p>
-            <a class="boton boton-primario" asp-controller="Home" asp-action="Index" asp-fragment="coleccion">Ir a la colección <span aria-hidden="true">↗</span></a></div>
+            <a class="boton boton-primario" asp-controller="Home" asp-action="Coleccion">Ir a la colección <span aria-hidden="true">↗</span></a></div>
         </div>
     }
     else

@@ -119,3 +119,77 @@ if (botonConfirmar) {
         }
     });
 }
+
+// El enlace y los formularios conservan su navegación normal sin JavaScript.
+const bolsa = document.querySelector("[data-bolsa]");
+const enlaceBolsa = document.querySelector("[data-bolsa-url]");
+if (bolsa && enlaceBolsa && typeof bolsa.showModal === "function") {
+    const contenido = bolsa.querySelector("[data-bolsa-contenido]");
+    const aviso = bolsa.querySelector(".bolsa-aviso");
+    let enviando = false;
+    let lectura;
+    enlaceBolsa.setAttribute("aria-haspopup", "dialog");
+
+    function mostrarBolsa(mensaje) {
+        aviso.textContent = mensaje;
+        contenido.replaceChildren();
+        if (!bolsa.open) bolsa.showModal();
+    }
+    function actualizarBolsa(html, mensaje) {
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const resumen = doc.querySelector("[data-total-botellas]");
+        if (!resumen) throw new Error("Resumen no disponible");
+        contenido.replaceChildren(resumen);
+        enlaceBolsa.querySelector("span").textContent = resumen.dataset.totalBotellas;
+        aviso.textContent = mensaje;
+    }
+    enlaceBolsa.addEventListener("click", async evento => {
+        if (evento.ctrlKey || evento.metaKey || evento.shiftKey || evento.altKey) return;
+        evento.preventDefault();
+        if (enviando) return;
+        lectura?.abort();
+        const solicitud = new AbortController();
+        lectura = solicitud;
+        mostrarBolsa("Consultando tu cesta…");
+        try {
+            const respuesta = await fetch(enlaceBolsa.dataset.bolsaUrl, { signal: solicitud.signal, cache: "no-store" });
+            if (!respuesta.ok) throw new Error();
+            actualizarBolsa(await respuesta.text(), "");
+        } catch {
+            if (!solicitud.signal.aborted) aviso.textContent = "No pudimos cargar el resumen. Abre la página de la cesta para revisarla.";
+        }
+    });
+    bolsa.addEventListener("close", () => lectura?.abort());
+    bolsa.addEventListener("click", evento => {
+        const limites = bolsa.getBoundingClientRect();
+        if (evento.target === bolsa && (evento.clientX < limites.left || evento.clientY < limites.top || evento.clientX > limites.right || evento.clientY > limites.bottom)) bolsa.close();
+    });
+    document.addEventListener("submit", async evento => {
+        const form = evento.target;
+        if (!form.matches(".producto-acciones form")) return;
+        evento.preventDefault();
+        if (enviando) return;
+        enviando = true;
+        lectura?.abort();
+        const datos = new FormData(form);
+        datos.set("vistaRapida", "true");
+        form.closest("dialog")?.close();
+        mostrarBolsa("Añadiendo a tu cesta…");
+        try {
+            const respuesta = await fetch(form.action, { method: "POST", body: datos });
+            if (respuesta.status === 409) {
+                aviso.textContent = (await respuesta.json()).mensaje;
+            } else {
+                if (!respuesta.ok) throw new Error();
+                actualizarBolsa(await respuesta.text(), "Añadido a tu cesta.");
+            }
+        } catch {
+            aviso.textContent = "Revisa tu cesta antes de volver a añadir la botella.";
+        } finally {
+            enviando = false;
+        }
+    });
+}
+for (const enlace of document.querySelectorAll(".nav-personal a")) {
+    if (new URL(enlace.href).pathname === location.pathname) enlace.setAttribute("aria-current", "page");
+}

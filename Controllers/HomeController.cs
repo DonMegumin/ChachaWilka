@@ -11,7 +11,13 @@ namespace ChachaWilka.Controllers;
 
 public class HomeController(AppDbContext db, ILogger<HomeController> logger) : Controller
 {
-    public async Task<IActionResult> Index(string? categoria, bool soloColeccion = false)
+    public Task<IActionResult> Index(string? categoria, bool soloColeccion = false) =>
+        MostrarCatalogo(categoria, soloColeccion, false);
+
+    public Task<IActionResult> Coleccion(string? categoria, bool soloColeccion = false) =>
+        MostrarCatalogo(categoria, soloColeccion, true);
+
+    private async Task<IActionResult> MostrarCatalogo(string? categoria, bool soloColeccion, bool completo)
     {
         categoria = categoria is CatalogoMarca.Cremas or CatalogoMarca.Licores ? categoria : null;
         PortadaVM portada;
@@ -29,7 +35,8 @@ public class HomeController(AppDbContext db, ILogger<HomeController> logger) : C
             var catalogo = CatalogoMarca.Productos().Where(p => categoria == null || p.Categoria == categoria).ToList();
             portada = new PortadaVM(catalogo, new(), categoria, false);
         }
-        return soloColeccion ? PartialView("_Coleccion", portada) : View(portada);
+        ViewData["Catalogo"] = completo;
+        return soloColeccion ? PartialView("_Coleccion", portada) : View(completo ? "Coleccion" : "Index", portada);
     }
 
     public IActionResult Privacy() => View();

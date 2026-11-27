@@ -1,14 +1,23 @@
 @model PortadaVM
-@{ var personal = User.IsInRole(RolesTienda.Administrador) || User.IsInRole(RolesTienda.Empleado); }
-<section class="marco seccion coleccion" id="coleccion" aria-labelledby="coleccion-titulo">
+@{
+    var personal = User.IsInRole(RolesTienda.Administrador) || User.IsInRole(RolesTienda.Empleado);
+    var completa = ViewData["Catalogo"] is true;
+    var destino = completa ? "Coleccion" : "Index";
+}
+<section class="marco seccion coleccion @(completa ? "catalogo-completo" : "galeria")" id="coleccion" aria-labelledby="coleccion-titulo">
     <div class="seccion-cabecera">
-        <h2 id="coleccion-titulo">La colección</h2>
+        @if (completa) { <h1 id="coleccion-titulo">La colección.</h1> }
+        else
+        {
+            <h2 id="coleccion-titulo">Explora los sabores.</h2>
+            <a class="ver-coleccion" asp-action="Coleccion">Ver toda la colección <span class="flecha" aria-hidden="true"></span></a>
+        }
     </div>
     <div class="barra-coleccion">
         <nav class="filtros" aria-label="Filtrar colección">
-            <a asp-action="Index" asp-fragment="coleccion" aria-current="@(Model.Categoria == null ? "true" : null)">Todos</a>
-            <a asp-action="Index" asp-route-categoria="Licores" asp-fragment="coleccion" aria-current="@(Model.Categoria == "Licores" ? "true" : null)">Licores</a>
-            <a asp-action="Index" asp-route-categoria="Cremas" asp-fragment="coleccion" aria-current="@(Model.Categoria == "Cremas" ? "true" : null)">Cremas</a>
+            <a asp-action="@destino" asp-fragment="coleccion" aria-current="@(Model.Categoria == null ? "true" : null)">Todos</a>
+            <a asp-action="@destino" asp-route-categoria="Licores" asp-fragment="coleccion" aria-current="@(Model.Categoria == "Licores" ? "true" : null)">Licores</a>
+            <a asp-action="@destino" asp-route-categoria="Cremas" asp-fragment="coleccion" aria-current="@(Model.Categoria == "Cremas" ? "true" : null)">Cremas</a>
         </nav>
         @if (Model.Productos.Count > 0)
         {
@@ -67,4 +76,11 @@
             </article>
         }
     </div>
+    @if (!completa && Model.Productos.Count > 1)
+    {
+        <div class="controles-galeria" hidden>
+            <button type="button" data-avance="-1" aria-label="Sabores anteriores"><span class="flecha" aria-hidden="true"></span></button>
+            <button type="button" data-avance="1" aria-label="Sabores siguientes"><span class="flecha" aria-hidden="true"></span></button>
+        </div>
+    }
 </section>

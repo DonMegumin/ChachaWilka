@@ -1,0 +1,29 @@
+@model CarritoCalculado
+<div data-total-botellas="@Model.Cantidad">
+@if (Model.Cantidad == 0)
+{
+    <img class="bolsa-vacia-foto" src="~/images/chachawillka/escena-aguaymanto.webp" alt="" />
+    <h3>Tu cesta está vacía.</h3>
+    <p>Descubre los sabores de la colección o elige cuatro para armar tu caja.</p>
+    <a class="boton boton-primario" asp-controller="Home" asp-action="Coleccion">Explorar la colección</a>
+}
+else
+{
+    <p>@Model.Cantidad @(Model.Cantidad == 1 ? "botella" : "botellas") para recojo en Chachapoyas.</p>
+    @foreach (var linea in Model.Lineas.Where(l => l.Combo == null))
+    {
+        <div class="bolsa-linea">
+            @if (!string.IsNullOrEmpty(linea.Producto.Imagen)) { <img src="~/images/chachawillka/@linea.Producto.Imagen" alt="" /> }
+            <span><strong>@linea.Producto.Nombre</strong><small>@linea.Cantidad × S/ @linea.Precio.ToString("0.00")</small></span>
+        </div>
+    }
+    @foreach (var combo in Model.Seleccion.Combos)
+    {
+        <div class="bolsa-linea"><img src="~/images/chachawillka/@(combo.Categoria == CatalogoMarca.Cremas ? "caja-cremas.webp" : "caja-licores.webp")" alt="" />
+            <span><strong>Caja de @combo.Categoria.ToLowerInvariant()</strong><small>4 botellas</small></span></div>
+    }
+    @foreach (var error in Model.Errores) { <p class="validacion">@error</p> }
+    <div class="total"><span>Total</span><strong>S/ @Model.Total.ToString("0.00")</strong></div>
+    <a class="boton boton-primario" asp-controller="Cesta" asp-action="Index">Revisar mi cesta <span class="flecha" aria-hidden="true"></span></a>
+}
+</div>

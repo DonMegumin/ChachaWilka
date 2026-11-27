@@ -1,14 +1,28 @@
-<section class="portada" aria-labelledby="titulo-portada">
-    <div class="marco portada-interior" data-enter>
-        <div class="portada-texto">
-            <h1 id="titulo-portada"><span class="solo-lectura">Licores y cremas de </span>Chachapoyas<span aria-hidden="true">.</span></h1>
-            <p>Licores y cremas artesanales. Por botella o en una caja con cuatro sabores a tu elección.</p>
-            <a class="boton boton-primario" href="#coleccion">Explorar la colección <span class="flecha" aria-hidden="true"></span></a>
-        </div>
-        <picture class="portada-foto">
-            <source media="(max-width: 680px)" srcset="@Url.Content("~/images/chachawillka/combo-licores.jpg")" width="640" height="794" />
-            <img src="~/images/chachawillka/combo-licores-2.jpg" alt="Colección de licores ChachaWillka con sus ingredientes"
-                 width="640" height="383" fetchpriority="high" />
-        </picture>
+<section class="escena" aria-label="Licores y cremas de Chachapoyas" data-escena>
+    <h1 class="solo-lectura">ChachaWillka · Licores y cremas artesanales de Chachapoyas</h1>
+    @foreach (var sabor in new[] {
+        (Foto: "aguaymanto", Nombre: "Aguaymanto", Tipo: "Licores", Inicio: "Chachapoyas,", Final: "en una botella.", Descripcion: "Aguaymanto de notas ácidas y frutales. Descubre los licores artesanales de nuestra colección."),
+        (Foto: "cafe", Nombre: "Café", Tipo: "Cremas", Inicio: "El carácter", Final: "del café.", Descripcion: "Café intenso y textura cremosa. Explora la colección de cremas artesanales de ChachaWillka.")
+    })
+    {
+        var primera = sabor.Tipo == "Licores";
+        <article class="escena-slide @(primera ? "actual" : null)" inert="@(!primera)" aria-hidden="@(!primera ? "true" : null)" data-slide>
+            <picture class="escena-imagen">
+                <source media="(max-width: 680px)" srcset="@Url.Content($"~/images/chachawillka/escena-{sabor.Foto}-movil.webp")" />
+                <img src="@Url.Content($"~/images/chachawillka/escena-{sabor.Foto}.webp")" fetchpriority="@(primera ? "high" : "low")" width="1536" height="1024" alt="Botella ChachaWillka de @sabor.Nombre con sus ingredientes" />
+            </picture>
+            <div class="escena-copy">
+                <h2>@sabor.Inicio <em>@sabor.Final</em></h2>
+                <p>@sabor.Descripcion</p>
+                <div class="escena-acciones">
+                    <a class="boton boton-lima" asp-action="Coleccion" asp-route-categoria="@sabor.Tipo">Explorar @sabor.Tipo.ToLowerInvariant() <span class="flecha" aria-hidden="true"></span></a>
+                    <a class="enlace-escena" href="#cajas">Ver cajas</a>
+                </div>
+            </div>
+        </article>
+    }
+    <div class="escena-selector" aria-label="Cambiar sabor de portada" hidden>
+        <button type="button" aria-pressed="true" data-escena-indice="0"><i></i>Aguaymanto</button>
+        <button type="button" aria-pressed="false" data-escena-indice="1"><i></i>Café</button>
     </div>
 </section>

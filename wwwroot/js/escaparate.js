@@ -6,6 +6,7 @@ let solicitudActual;
 let categoriaMostrada = new URL(location.href).searchParams.get("categoria");
 let consulta = "";
 let anunciarBusqueda;
+let observarGaleria;
 
 function normalizar(texto) {
     return texto.toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").trim();
@@ -18,6 +19,7 @@ function prepararColeccion() {
     const control = coleccion.querySelector("[data-busqueda]");
     const productos = [...coleccion.querySelectorAll(".producto")];
     const vacio = coleccion.querySelector("[data-sin-resultados]");
+    const sincronizarGaleria = prepararGaleria();
     const aplicar = () => {
         const terminos = normalizar(consulta).split(/\s+/);
         let visibles = 0;
@@ -27,6 +29,7 @@ function prepararColeccion() {
             if (!producto.hidden) visibles++;
         }
         vacio.hidden = visibles > 0 || productos.length === 0;
+        sincronizarGaleria?.();
         return visibles;
     };
     if (control) {
@@ -81,7 +84,9 @@ async function cargarColeccion(destino, agregarHistorial) {
         if (!nueva) throw new Error();
         if (solicitud.signal.aborted) return;
         clearTimeout(anunciarBusqueda);
+        observarGaleria?.disconnect();
         coleccion.replaceWith(nueva);
+        nueva.classList.add("actualizada");
         coleccion = nueva;
         const visibles = prepararColeccion();
         categoriaMostrada = destino.searchParams.get("categoria");
@@ -117,11 +122,59 @@ window.addEventListener("popstate", () => {
 });
 
 const momento = document.querySelector("[data-momento-cajas]");
-if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+if (momento && "IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
     const observar = new IntersectionObserver((entradas, observador) => {
         if (!entradas.some(entrada => entrada.isIntersecting)) return;
         momento.classList.add("momento-visible");
         observador.disconnect();
     }, { threshold: .18 });
     observar.observe(momento);
+}
+
+function prepararGaleria() {
+    const controles = coleccion.querySelector(".controles-galeria");
+    if (!controles) return;
+    const tira = coleccion.querySelector(".productos");
+    const [anterior, siguiente] = controles.querySelectorAll("button");
+    function sincronizar() {
+        const limite = tira.scrollWidth - tira.clientWidth;
+        controles.hidden = limite < 2;
+        anterior.disabled = tira.scrollLeft <= 2;
+        siguiente.disabled = tira.scrollLeft >= limite - 2;
+    }
+    controles.addEventListener("click", evento => {
+        const boton = evento.target.closest("[data-avance]");
+        if (!boton) return;
+        const tarjeta = tira.querySelector(".producto:not([hidden])");
+        if (!tarjeta) return;
+        const paso = tarjeta.getBoundingClientRect().width + parseFloat(getComputedStyle(tira).columnGap);
+        const cantidad = Math.max(1, Math.floor(tira.clientWidth / paso));
+        tira.scrollBy({ left: Number(boton.dataset.avance) * paso * cantidad, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+    });
+    tira.addEventListener("scroll", sincronizar, { passive: true });
+    if ("ResizeObserver" in window) {
+        observarGaleria = new ResizeObserver(sincronizar);
+        observarGaleria.observe(tira);
+    }
+    return sincronizar;
+}
+
+const escena = document.querySelector("[data-escena]");
+if (escena) {
+    const selector = escena.querySelector(".escena-selector");
+    const botones = [...selector.querySelectorAll("button")];
+    const slides = [...escena.querySelectorAll("[data-slide]")];
+    selector.hidden = false;
+    selector.addEventListener("click", evento => {
+        const boton = evento.target.closest("button");
+        if (!boton || boton.getAttribute("aria-pressed") === "true") return;
+        const indice = Number(boton.dataset.escenaIndice);
+        slides.forEach((slide, posicion) => {
+            const actual = posicion === indice;
+            slide.classList.toggle("actual", actual);
+            slide.inert = !actual;
+            slide.setAttribute("aria-hidden", String(!actual));
+            botones[posicion].setAttribute("aria-pressed", String(actual));
+        });
+    });
 }

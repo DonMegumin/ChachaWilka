@@ -10,23 +10,11 @@
 }
 <partial name="_Escena" />
 <partial name="_Coleccion" model="Model" />
-<p class="solo-lectura" data-resultado role="status"></p>
-<dialog class="ficha" aria-labelledby="ficha-nombre" data-ficha>
-    <div class="ficha-interior">
-        <div class="ficha-foto" data-ficha-foto></div>
-        <div class="ficha-texto">
-            <p class="detalle-categoria" data-ficha-categoria></p>
-            <h2 id="ficha-nombre"></h2>
-            <p data-ficha-descripcion></p>
-            <div class="producto-acciones" data-ficha-acciones></div>
-        </div>
-        <form method="dialog"><button type="submit" class="cerrar-ficha" aria-label="Cerrar ficha" autofocus></button></form>
-    </div>
-</dialog>
+<partial name="_Ficha" />
 <section class="cajas" id="cajas" aria-labelledby="cajas-titulo">
     <div class="marco seccion">
         <div class="seccion-cabecera cajas-cabecera">
-            <h2 id="cajas-titulo">Cuatro sabores.<br /><em>Tu propia caja.</em></h2>
+            <h2 id="cajas-titulo">Cuatro sabores. <em>Tu caja.</em></h2>
             <p>Combina cuatro botellas de licores o cuatro de cremas. Tú eliges qué va dentro.</p>
         </div>
         <div class="cajas-lista" data-momento-cajas>
@@ -72,9 +60,11 @@
             }
         </div>
     </div>
+    <details class="guia-recojo"><summary>Cómo recoger mi pedido <span class="flecha" aria-hidden="true"></span></summary>
     <ol class="pasos-recojo">
         <li><h3>Haz tu pedido</h3><p>Elige tus botellas o arma una caja y confirma en la cesta.</p></li>
         <li><h3>Paga con Yape</h3><p>Consulta el importe y envía el comprobante desde tu pedido.</p></li>
         <li><h3>Pasa por el local</h3><p>Cuando tu pedido figure listo, presenta el código del pedido y tu documento.</p></li>
     </ol>
+    </details>
 </section>
