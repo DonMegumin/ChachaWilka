@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ChachaWilka.Models
@@ -19,6 +19,6 @@ namespace ChachaWilka.Models
         [Required]
         public bool Estado_Combo { get; set; }
         //Combo 1:M DetalleCombo
-        public ICollection<DetalleCombo> DetalleCombos { get; set; }
+        public ICollection<DetalleCombo> DetalleCombos { get; set; } = [];
     }
 }

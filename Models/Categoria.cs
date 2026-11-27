@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ChachaWilka.Models
@@ -11,7 +11,8 @@ namespace ChachaWilka.Models
         [Required]
         [StringLength(50)]
         public string Nombre_Categoria { get; set; } = string.Empty;
+        public bool Activa { get; set; } = true;
         //Categoria 1:M Producto
-        public ICollection<Producto> Productos { get; set; }
+        public ICollection<Producto> Productos { get; set; } = [];
     }
 }

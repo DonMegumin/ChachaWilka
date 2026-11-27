@@ -1,5 +1,34 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+@model UsuarioVM
+@{ ViewData["Title"] = "Crear cuenta"; }
+<section class="marco pagina acceso">
+    <figure class="acceso-foto"><img src="~/images/chachawillka/combo-cremas-2.jpg" alt="Colección de cremas artesanales" width="640" height="853" /></figure>
+    <div class="panel">
+        <h1>Crea tu cuenta</h1>
+        <p>Usa tu cuenta para hacer pedidos y consultar cuándo recogerlos.</p>
+        <form asp-action="Registro" method="post" class="formulario">
+            <div asp-validation-summary="ModelOnly" class="validacion" role="alert"></div>
+            <label asp-for="Nombre">Nombre completo</label>
+            <input asp-for="Nombre" autocomplete="name" maxlength="50" required />
+            <span asp-validation-for="Nombre" class="validacion"></span>
+            <label asp-for="Correo">Correo electrónico</label>
+            <input asp-for="Correo" type="email" autocomplete="email" maxlength="100" required />
+            <span asp-validation-for="Correo" class="validacion"></span>
+            <label asp-for="Telefono">Teléfono</label>
+            <input asp-for="Telefono" type="tel" autocomplete="tel" maxlength="20" required />
+            <span asp-validation-for="Telefono" class="validacion"></span>
+            <label asp-for="Nacimiento">Fecha de nacimiento</label>
+            <input asp-for="Nacimiento" type="date" autocomplete="bday" required />
+            <span asp-validation-for="Nacimiento" class="validacion"></span>
+            <label asp-for="Contraseña">Contraseña</label>
+            <input asp-for="Contraseña" autocomplete="new-password" minlength="12" maxlength="128" required />
+            <span asp-validation-for="Contraseña" class="validacion"></span>
+            <label asp-for="RepiteContraseña">Repite la contraseña</label>
+            <input asp-for="RepiteContraseña" autocomplete="new-password" required />
+            <span asp-validation-for="RepiteContraseña" class="validacion"></span>
+            <label class="casilla"><input asp-for="Consentimiento" required /><span>Acepto el uso de mis datos para gestionar mis pedidos según el <a class="subrayado" asp-controller="Home" asp-action="Privacy">aviso de privacidad</a>.</span></label>
+            <span asp-validation-for="Consentimiento" class="validacion"></span>
+            <button class="boton boton-primario" type="submit">Crear cuenta <span aria-hidden="true">↗</span></button>
+        </form>
+        <p>¿Ya tienes cuenta? <a class="subrayado" asp-action="Login">Ingresa aquí.</a></p>
+    </div>
+</section>

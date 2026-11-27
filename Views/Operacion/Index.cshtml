@@ -1,0 +1,21 @@
+@model IReadOnlyList<PedidoResumen>
+@{ ViewData["Title"] = "Operación"; }
+<section class="marco pagina">
+    <div class="seccion-cabecera"><div><h1>Operación</h1><p>Revisa el pago, prepara el pedido y registra el recojo.</p></div></div>
+    <form asp-action="Index" method="get" class="form-linea filtro-interno">
+        <label for="estado">Filtrar por estado</label>
+        <select id="estado" name="estado"><option value="">Todos</option>
+        @foreach (var estado in Enum.GetValues<EstadoPedido>())
+        { <option value="@estado" selected="@(ViewData["Estado"] is EstadoPedido actual && actual == estado)">@estado.Etiqueta()</option> }</select>
+        <button class="boton boton-secundario" type="submit">Filtrar</button>
+    </form>
+    @if (Model.Count == 0) { <p class="vacio">No hay pedidos para este filtro.</p> }
+    else { <partial name="_ListaPedidos" model="Model" /> }
+    @if (ViewData["Consultas"] is List<KeyValuePair<int, string>> consultas && consultas.Count > 0)
+    {
+        <section class="panel margen-superior"><h2>Consultas pendientes</h2><ul>
+        @foreach (var consulta in consultas)
+        { <li><a class="subrayado" asp-controller="Pedidos" asp-action="Detalle" asp-route-id="@consulta.Key" asp-fragment="consultas">@consulta.Value</a></li> }
+        </ul></section>
+    }
+</section>

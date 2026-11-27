@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ChachaWilka.Models
@@ -21,12 +21,18 @@ namespace ChachaWilka.Models
         public decimal Precio { get; set; }
         [Required]
         public int Stock { get; set; }
+        public int Reservado { get; set; }
+        public bool Activo { get; set; } = true;
+        [StringLength(140)] public string Imagen { get; set; } = "";
+        [StringLength(70)] public string? ReferenciaCatalogo { get; set; }
+        [Timestamp] public byte[] Version { get; set; } = [];
+        [NotMapped] public int Disponible => Stock - Reservado;
         //Producto M:1 Categoria
         public int Id_Categoria { get; set; }
-        public Categoria Categorias { get; set; }
+        public Categoria Categorias { get; set; } = null!;
         //Producto 1:M DetallePedido
-        public ICollection<DetallePedido> DetallePedidos { get; set; }
+        public ICollection<DetallePedido> DetallePedidos { get; set; } = [];
         //Producto 1:M DetalleCombo
-        public ICollection<DetalleCombo> DetalleCombos { get; set; }
+        public ICollection<DetalleCombo> DetalleCombos { get; set; } = [];
     }
 }

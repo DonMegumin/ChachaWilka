@@ -1,0 +1,29 @@
+@model CuentaVM
+@{ ViewData["Title"] = "Mi cuenta"; }
+<section class="marco pagina pagina-estrecha">
+    <h1>Mi cuenta</h1>
+    <div class="apilado">
+        <section class="panel">
+            <h2>@Model.Nombre</h2><p>@Model.Correo</p>
+            @if (Model.DeclaracionPendiente)
+            {
+                <p>Completa estos datos para poder confirmar pedidos.</p>
+                <form asp-action="CompletarCuenta" method="post" class="formulario">
+                    <label for="nacimiento">Fecha de nacimiento</label><input id="nacimiento" name="nacimiento" type="date" required />
+                    <label for="telefono">Teléfono</label><input id="telefono" name="telefono" type="tel" maxlength="20" value="@Model.Telefono" required />
+                    <label class="casilla"><input name="consentimiento" type="checkbox" value="true" required /><span>Acepto el tratamiento de mis datos según el <a class="subrayado" asp-controller="Home" asp-action="Privacy">aviso de privacidad</a>.</span></label>
+                    <button class="boton boton-primario" type="submit">Completar mi cuenta</button>
+                </form>
+            }
+        </section>
+        <section class="panel">
+            <h2>Cambiar contraseña</h2>
+            <form asp-action="CambiarClave" method="post" class="formulario">
+                <label for="actual">Contraseña actual</label><input name="actual" id="actual" type="password" autocomplete="current-password" required maxlength="128" />
+                <label for="nueva">Nueva contraseña</label><input name="nueva" id="nueva" type="password" autocomplete="new-password" minlength="12" maxlength="128" required />
+                <label for="repetida">Repite la nueva contraseña</label><input name="repetida" id="repetida" type="password" autocomplete="new-password" required maxlength="128" />
+                <button class="boton boton-primario" type="submit">Cambiar contraseña</button>
+            </form>
+        </section>
+    </div>
+</section>
