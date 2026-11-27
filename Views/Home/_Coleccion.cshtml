@@ -2,15 +2,21 @@
 @{ var personal = User.IsInRole(RolesTienda.Administrador) || User.IsInRole(RolesTienda.Empleado); }
 <section class="marco seccion coleccion" id="coleccion" aria-labelledby="coleccion-titulo">
     <div class="seccion-cabecera">
-        <div>
-            <h2 id="coleccion-titulo">La colección</h2>
-            <p>Macerados de fruta, notas de café y cremas suaves. Elige por dónde empezar.</p>
-        </div>
+        <h2 id="coleccion-titulo">La colección</h2>
+    </div>
+    <div class="barra-coleccion">
         <nav class="filtros" aria-label="Filtrar colección">
             <a asp-action="Index" asp-fragment="coleccion" aria-current="@(Model.Categoria == null ? "true" : null)">Todos</a>
             <a asp-action="Index" asp-route-categoria="Licores" asp-fragment="coleccion" aria-current="@(Model.Categoria == "Licores" ? "true" : null)">Licores</a>
             <a asp-action="Index" asp-route-categoria="Cremas" asp-fragment="coleccion" aria-current="@(Model.Categoria == "Cremas" ? "true" : null)">Cremas</a>
         </nav>
+        @if (Model.Productos.Count > 0)
+        {
+            <label class="buscar-sabores" hidden data-busqueda>
+                <span class="solo-lectura">Buscar sabor en esta colección</span>
+                <input type="search" placeholder="Buscar sabor" autocomplete="off" maxlength="80" />
+            </label>
+        }
     </div>
     @if (!Model.Disponible)
     {
@@ -20,15 +26,18 @@
     {
         <p class="vacio">Por ahora no hay productos en esta colección.</p>
     }
+    <p class="vacio" data-sin-resultados hidden>No encontramos ese sabor. Prueba con otro nombre o cambia de colección.</p>
     <div class="productos">
         @foreach (var producto in Model.Productos)
         {
             <article class="producto">
                 <div class="producto-foto">
-                    <button type="button" class="abrir-ficha" aria-label="Ver ficha de @producto.Nombre" aria-haspopup="dialog" hidden data-abrir-ficha><span>Ver ficha ↗</span></button>
+                    <button type="button" class="abrir-ficha" aria-label="Ver ficha de @producto.Nombre" aria-haspopup="dialog" hidden data-abrir-ficha>
+                        <span class="flecha" aria-hidden="true"></span>
+                    </button>
                     @if (!string.IsNullOrWhiteSpace(producto.Imagen))
                     {
-                        <img src="~/images/chachawillka/@producto.Imagen" alt="@producto.Nombre" width="640" height="585" loading="lazy" />
+                        <img src="~/images/chachawillka/@producto.Imagen" alt="@producto.Nombre" width="640" height="585" loading="lazy" decoding="async" />
                     }
                     else
                     {

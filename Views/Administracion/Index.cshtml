@@ -1,12 +1,12 @@
 @{ ViewData["Title"] = "Administración"; }
-<section class="marco pagina">
+<section class="marco pagina administracion-inicio">
     <h1>Administración</h1>
     <p>Gestiona la colección y la actividad del local.</p>
-    <div class="modulos">
-        <a class="panel modulo" asp-action="Catalogo"><h2>Catálogo e inventario <span aria-hidden="true">↗</span></h2><p>Productos, categorías y movimientos de stock.</p></a>
-        <a class="panel modulo" asp-controller="Operacion" asp-action="Index"><h2>Pedidos <span aria-hidden="true">↗</span></h2><p>Pagos, preparación, recojo y consultas pendientes.</p></a>
-        <a class="panel modulo" asp-action="Usuarios"><h2>Cuentas <span aria-hidden="true">↗</span></h2><p>Personal, roles y estado de acceso.</p></a>
-        <a class="panel modulo" asp-action="Reportes"><h2>Reportes <span aria-hidden="true">↗</span></h2><p>Cobros por Yape, ventas retiradas e inventario.</p></a>
-        <a class="panel modulo" asp-action="Ajustes"><h2>Ajustes de la tienda <span aria-hidden="true">↗</span></h2><p>Yape, atención, WhatsApp y precios de las cajas.</p></a>
+    <div class="modulos administracion-destinos">
+        <a class="panel modulo" asp-action="Catalogo"><h2>Catálogo e inventario <span class="flecha" aria-hidden="true"></span></h2><p>Productos, categorías y movimientos de stock.</p></a>
+        <a class="panel modulo" asp-controller="Operacion" asp-action="Index"><h2>Pedidos <span class="flecha" aria-hidden="true"></span></h2><p>Pagos, preparación, recojo y consultas pendientes.</p></a>
+        <a class="panel modulo" asp-action="Usuarios"><h2>Cuentas <span class="flecha" aria-hidden="true"></span></h2><p>Personal, roles y estado de acceso.</p></a>
+        <a class="panel modulo" asp-action="Reportes"><h2>Reportes <span class="flecha" aria-hidden="true"></span></h2><p>Cobros por Yape, ventas retiradas e inventario.</p></a>
+        <a class="panel modulo" asp-action="Ajustes"><h2>Ajustes de la tienda <span class="flecha" aria-hidden="true"></span></h2><p>Yape, atención, WhatsApp y precios de las cajas.</p></a>
     </div>
 </section>

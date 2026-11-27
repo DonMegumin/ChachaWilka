@@ -20,25 +20,16 @@
             <p data-ficha-descripcion></p>
             <div class="producto-acciones" data-ficha-acciones></div>
         </div>
-        <form method="dialog"><button type="submit" class="cerrar-ficha" aria-label="Cerrar ficha" autofocus>×</button></form>
+        <form method="dialog"><button type="submit" class="cerrar-ficha" aria-label="Cerrar ficha" autofocus></button></form>
     </div>
 </dialog>
 <section class="cajas" id="cajas" aria-labelledby="cajas-titulo">
     <div class="marco seccion">
-        <div class="seccion-cabecera">
-            <div><h2 id="cajas-titulo">Cuatro sabores,<br /><em>una caja.</em></h2><p>Elige cuatro sabores de una misma colección y arma tu caja.</p>
-                @if (cajas.Length > 1)
-                {
-                    <nav class="indice-cajas" aria-label="Presentaciones de caja">
-                        @foreach (var caja in cajas)
-                        {
-                            <a href="#caja-@caja.Nombre.ToLowerInvariant()">@caja.Nombre</a>
-                        }
-                    </nav>
-                }
-            </div>
+        <div class="seccion-cabecera cajas-cabecera">
+            <h2 id="cajas-titulo">Cuatro sabores.<br /><em>Tu propia caja.</em></h2>
+            <p>Combina cuatro botellas de licores o cuatro de cremas. Tú eliges qué va dentro.</p>
         </div>
-        <div class="cajas-lista">
+        <div class="cajas-lista" data-momento-cajas>
             @if (cajas.Length == 0)
             {
                 <p>Por el momento no hay cajas disponibles.</p>
@@ -46,13 +37,19 @@
             @foreach (var caja in cajas)
             {
                 <article class="caja" id="caja-@caja.Nombre.ToLowerInvariant()">
-                    <img src="~/images/chachawillka/@caja.Foto" alt="Ejemplo de una caja ChachaWillka con cuatro botellas de @caja.Nombre.ToLowerInvariant()" width="1200" height="800" loading="lazy" />
-                    <div>
-                        <h3>Caja de @caja.Nombre.ToLowerInvariant()</h3>
-                        <p>4 unidades · S/ @caja.Precio.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)</p>
+                    <div class="caja-foto">
+                        <img src="~/images/chachawillka/@caja.Foto" alt="Presentación referencial de la caja ChachaWillka de @caja.Nombre.ToLowerInvariant()"
+                             width="1200" height="800" loading="lazy" />
+                    </div>
+                    <div class="caja-datos">
+                        <div>
+                            <h3>Caja de @caja.Nombre.ToLowerInvariant()</h3>
+                            <p>4 botellas · S/ @caja.Precio.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)</p>
+                        </div>
                         @if (Model.Disponible && !personal)
                         {
-                            <a class="boton boton-linea" asp-controller="Cesta" asp-action="Combo" asp-route-categoria="@caja.Nombre">Armar mi caja <span aria-hidden="true">↗</span></a>
+                            <a class="boton boton-linea" asp-controller="Cesta" asp-action="Combo" asp-route-categoria="@caja.Nombre"
+                               aria-label="Armar caja de @caja.Nombre.ToLowerInvariant()">Armar caja <span class="flecha" aria-hidden="true"></span></a>
                         }
                     </div>
                 </article>
@@ -60,15 +57,24 @@
         </div>
     </div>
 </section>
-<section class="marco seccion visita" id="recojo">
-    <div><p class="detalle-categoria">Visítanos</p><h2>Nos vemos en<br /><em>Chachapoyas.</em></h2></div>
+<section class="marco seccion visita" id="recojo" aria-labelledby="recojo-titulo">
     <div>
-        <h3>Recojo en el local</h3>
-        <p>@Model.Ajustes.Direccion</p>
-        @if (!string.IsNullOrWhiteSpace(Model.Ajustes.Horario)) { <p>@Model.Ajustes.Horario</p> }
-        @if (!string.IsNullOrWhiteSpace(Model.Ajustes.WhatsApp))
-        {
-            <a class="enlace-flecha" href="https://wa.me/@Model.Ajustes.WhatsApp" target="_blank" rel="noopener noreferrer">Consultar por WhatsApp ↗</a>
-        }
+        <h2 id="recojo-titulo">Recojo en<br /><em>Chachapoyas.</em></h2>
+        <div class="datos-recojo">
+            <p>@Model.Ajustes.Direccion</p>
+            @if (!string.IsNullOrWhiteSpace(Model.Ajustes.Horario))
+            {
+                <p>@Model.Ajustes.Horario</p>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.Ajustes.WhatsApp))
+            {
+                <a class="enlace-flecha" href="https://wa.me/@Model.Ajustes.WhatsApp" target="_blank" rel="noopener noreferrer">Consultar por WhatsApp <span class="flecha" aria-hidden="true"></span></a>
+            }
+        </div>
     </div>
+    <ol class="pasos-recojo">
+        <li><h3>Haz tu pedido</h3><p>Elige tus botellas o arma una caja y confirma en la cesta.</p></li>
+        <li><h3>Paga con Yape</h3><p>Consulta el importe y envía el comprobante desde tu pedido.</p></li>
+        <li><h3>Pasa por el local</h3><p>Cuando tu pedido figure listo, presenta el código del pedido y tu documento.</p></li>
+    </ol>
 </section>

@@ -6,26 +6,28 @@
     var cantidad = cesta.Botellas.Values.Sum() + cesta.Combos.Count * 4;
 }
 <!DOCTYPE html>
-<html lang="es-PE">
+<html lang="es-PE" data-type="@(portada ? "product" : null)">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#14251f" />
+    <meta name="theme-color" content="#fcfaf8" />
     <meta name="description" content="Descubre la colección de licores y cremas artesanales de ChachaWillka. Haz tu pedido para recojo en Chachapoyas." />
     <title>@ViewData["Title"] — ChachaWillka</title>
     <link rel="icon" type="image/jpeg" href="~/images/chachawillka/instagram-perfil.jpg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&amp;family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @if (portada)
     {
+        <meta name="page-type" content="product" />
+        <meta name="site-kind" content="other" />
         <link rel="stylesheet" href="~/css/escaparate.css" asp-append-version="true" />
         <script src="~/js/escaparate.js" asp-append-version="true" defer></script>
     }
     <script src="~/js/site.js" asp-append-version="true" defer></script>
 </head>
-<body class="@(portada ? "es-portada" : "")">
+<body class="@(portada ? "es-portada" : "") @(personal && !portada ? "es-personal" : "")">
     <a class="skip" href="#contenido">Saltar al contenido</a>
     <header class="cabecera">
         <div class="marco cabecera-interior">

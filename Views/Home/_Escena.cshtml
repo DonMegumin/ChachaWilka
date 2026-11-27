@@ -1,43 +1,14 @@
-@{
-    var sabores = new[] {
-        (Clave: "aguaymanto", Nombre: "Aguaymanto", Foto: "licor-aguaymanto.jpg", Nota: "Frutal, con un punto ácido.", Tipo: "Licor de fruta"),
-        (Clave: "mora", Nombre: "Mora", Foto: "licor-mora.jpg", Nota: "El carácter de la mora.", Tipo: "Licor de fruta"),
-        (Clave: "coco", Nombre: "Coco", Foto: "crema-coco.jpg", Nota: "Suave y cremoso.", Tipo: "Crema artesanal")
-    };
-}
-<section class="escena" data-escena data-tono="aguaymanto" aria-labelledby="titulo-portada">
-    <div class="marco escenario">
-        <div class="relato">
-            <p class="lugar"><span aria-hidden="true"></span> Chachapoyas · Perú</p>
-            <h1 id="titulo-portada">Amazonas,<br /><em>en botella.</em></h1>
-            <p class="introduccion">Licores y cremas artesanales de Chachapoyas. Descubre la colección, botella por botella.</p>
-            <div class="enlaces-portada">
-                <a class="boton boton-portada" href="#coleccion">Explorar sabores <span aria-hidden="true">↓</span></a>
-                <a class="enlace-caja" href="#cajas">Ver las cajas <span aria-hidden="true">↗</span></a>
-            </div>
+<section class="portada" aria-labelledby="titulo-portada">
+    <div class="marco portada-interior" data-enter>
+        <div class="portada-texto">
+            <h1 id="titulo-portada"><span class="solo-lectura">Licores y cremas de </span>Chachapoyas<span aria-hidden="true">.</span></h1>
+            <p>Licores y cremas artesanales. Por botella o en una caja con cuatro sabores a tu elección.</p>
+            <a class="boton boton-primario" href="#coleccion">Explorar la colección <span class="flecha" aria-hidden="true"></span></a>
         </div>
-        <div class="muestra" data-muestra>
-            <div class="orbita" aria-hidden="true"></div>
-            @foreach (var sabor in sabores)
-            {
-                var primera = sabor == sabores[0];
-                <figure class="lamina @sabor.Clave" data-lamina="@sabor.Clave" aria-hidden="@(!primera ? "true" : "false")">
-                    <div class="ventana" aria-hidden="true"><img src="~/images/chachawillka/@sabor.Foto" alt="" width="640" height="585" decoding="async" /></div>
-                    <div class="frasco"><img src="~/images/chachawillka/@sabor.Foto" alt="Botella ChachaWillka de @sabor.Nombre.ToLowerInvariant()" width="640" height="585" fetchpriority="@(primera ? "high" : "low")" /></div>
-                    <figcaption><small>@sabor.Tipo</small><strong>@sabor.Nombre</strong><span>@sabor.Nota</span></figcaption>
-                </figure>
-            }
-        </div>
+        <picture class="portada-foto">
+            <source media="(max-width: 680px)" srcset="@Url.Content("~/images/chachawillka/combo-licores.jpg")" width="640" height="794" />
+            <img src="~/images/chachawillka/combo-licores-2.jpg" alt="Colección de licores ChachaWillka con sus ingredientes"
+                 width="640" height="383" fetchpriority="high" />
+        </picture>
     </div>
-    <div class="marco mando-escena">
-        <span class="leyenda-escena">Explora los sabores</span>
-        <div class="muestras" role="group" aria-label="Sabor en portada">
-            @foreach (var sabor in sabores)
-            {
-                <button type="button" data-sabor="@sabor.Clave" class="@sabor.Clave" aria-pressed="@(sabor == sabores[0] ? "true" : "false")"><i aria-hidden="true"></i>@sabor.Nombre</button>
-            }
-        </div>
-        <a class="bajar" href="#coleccion" aria-label="Bajar a la colección">↓</a>
-    </div>
-    <span class="solo-lectura" data-lectura-escena role="status"></span>
 </section>

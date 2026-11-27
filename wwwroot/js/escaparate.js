@@ -1,61 +1,54 @@
-const escena = document.querySelector("[data-escena]");
-const muestra = escena.querySelector("[data-muestra]");
-const laminas = [...muestra.querySelectorAll("[data-lamina]")];
-const sabores = [...escena.querySelectorAll("[data-sabor]")];
-let saborActual = 0;
-
-function mostrarSabor(indice) {
-    saborActual = (indice + sabores.length) % sabores.length;
-    const activo = sabores[saborActual];
-    escena.dataset.tono = activo.dataset.sabor;
-    for (const boton of sabores) boton.setAttribute("aria-pressed", String(boton === activo));
-    for (const lamina of laminas) lamina.setAttribute("aria-hidden", String(lamina.dataset.lamina !== activo.dataset.sabor));
-    const nota = laminas[saborActual].querySelector("figcaption span").textContent;
-    escena.querySelector("[data-lectura-escena]").textContent = activo.textContent.trim() + ". " + nota;
-}
-
-sabores.forEach((boton, indice) => {
-    boton.addEventListener("click", () => mostrarSabor(indice));
-    boton.addEventListener("keydown", evento => {
-        if (!["ArrowLeft", "ArrowRight"].includes(evento.key)) return;
-        evento.preventDefault();
-        mostrarSabor(indice + (evento.key === "ArrowRight" ? 1 : -1));
-        sabores[saborActual].focus();
-    });
-});
-
-let inicioGesto;
-muestra.addEventListener("pointerdown", evento => {
-    if (!evento.isPrimary || evento.button !== 0) return;
-    inicioGesto = { x: evento.clientX, y: evento.clientY, id: evento.pointerId };
-    muestra.setPointerCapture(evento.pointerId);
-});
-muestra.addEventListener("pointercancel", () => { inicioGesto = null; });
-muestra.addEventListener("pointerup", evento => {
-    if (inicioGesto?.id !== evento.pointerId) return;
-    const avance = evento.clientX - inicioGesto.x;
-    const vertical = evento.clientY - inicioGesto.y;
-    inicioGesto = null;
-    if (Math.abs(avance) > 38 && Math.abs(avance) > Math.abs(vertical) * 1.3)
-        mostrarSabor(saborActual + (avance < 0 ? 1 : -1));
-});
-escena.classList.add("interactiva");
-
 const ficha = document.querySelector("[data-ficha]");
 const admiteFicha = typeof ficha.showModal === "function";
+const resultado = document.querySelector("[data-resultado]");
 let coleccion = document.getElementById("coleccion");
-let leyendo;
+let solicitudActual;
 let categoriaMostrada = new URL(location.href).searchParams.get("categoria");
+let consulta = "";
+let anunciarBusqueda;
+
+function normalizar(texto) {
+    return texto.toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").trim();
+}
 
 function prepararColeccion() {
     if (admiteFicha) {
         for (const boton of coleccion.querySelectorAll("[data-abrir-ficha]")) boton.hidden = false;
     }
+    const control = coleccion.querySelector("[data-busqueda]");
+    const productos = [...coleccion.querySelectorAll(".producto")];
+    const vacio = coleccion.querySelector("[data-sin-resultados]");
+    const aplicar = () => {
+        const terminos = normalizar(consulta).split(/\s+/);
+        let visibles = 0;
+        for (const producto of productos) {
+            const texto = normalizar(producto.querySelector(".producto-texto").textContent);
+            producto.hidden = !terminos.every(termino => texto.includes(termino));
+            if (!producto.hidden) visibles++;
+        }
+        vacio.hidden = visibles > 0 || productos.length === 0;
+        return visibles;
+    };
+    if (control) {
+        const campo = control.querySelector("input");
+        control.hidden = false;
+        campo.value = consulta;
+        campo.addEventListener("input", () => {
+            consulta = campo.value;
+            const visibles = aplicar();
+            clearTimeout(anunciarBusqueda);
+            anunciarBusqueda = setTimeout(() => {
+                resultado.textContent = visibles === 1 ? "1 sabor encontrado." : `${visibles} sabores encontrados.`;
+            }, 220);
+        });
+    }
+    return aplicar();
 }
 prepararColeccion();
 
 function abrirFicha(producto) {
     const foto = producto.querySelector(".producto-foto img, .marca-sola").cloneNode(true);
+    if (foto instanceof HTMLImageElement) foto.loading = "eager";
     ficha.querySelector("[data-ficha-foto]").replaceChildren(foto);
     ficha.querySelector("#ficha-nombre").textContent = producto.querySelector("h3").textContent;
     ficha.querySelector("[data-ficha-categoria]").textContent = producto.querySelector(".detalle-categoria").textContent;
@@ -74,9 +67,9 @@ ficha.addEventListener("click", evento => {
 });
 
 async function cargarColeccion(destino, agregarHistorial) {
-    leyendo?.abort();
+    solicitudActual?.abort();
     const solicitud = new AbortController();
-    leyendo = solicitud;
+    solicitudActual = solicitud;
     coleccion.setAttribute("aria-busy", "true");
     const pagina = new URL(destino);
     pagina.searchParams.set("soloColeccion", "true");
@@ -87,20 +80,24 @@ async function cargarColeccion(destino, agregarHistorial) {
         const nueva = new DOMParser().parseFromString(html, "text/html").getElementById("coleccion");
         if (!nueva) throw new Error();
         if (solicitud.signal.aborted) return;
+        clearTimeout(anunciarBusqueda);
         coleccion.replaceWith(nueva);
         coleccion = nueva;
-        prepararColeccion();
+        const visibles = prepararColeccion();
         categoriaMostrada = destino.searchParams.get("categoria");
+        const filtroActivo = coleccion.querySelector(".filtros [aria-current]");
         if (agregarHistorial) {
             history.pushState(null, "", destino);
-            coleccion.querySelector(".filtros [aria-current]").focus({ preventScroll: true });
+            filtroActivo.focus({ preventScroll: true });
         }
-        document.querySelector("[data-resultado]").textContent =
-            coleccion.querySelector(".filtros [aria-current]").textContent + " · " + coleccion.querySelectorAll(".producto").length + " productos.";
-    } catch (error) {
+        resultado.textContent = `${filtroActivo.textContent} · ${visibles} ${visibles === 1 ? "sabor" : "sabores"}.`;
+    } catch {
         if (!solicitud.signal.aborted) location.assign(destino);
     } finally {
-        if (leyendo === solicitud) coleccion.removeAttribute("aria-busy");
+        if (solicitudActual === solicitud) {
+            solicitudActual = null;
+            coleccion.removeAttribute("aria-busy");
+        }
     }
 }
 
@@ -110,39 +107,21 @@ document.addEventListener("click", evento => {
     const filtro = evento.target.closest(".filtros a");
     if (!filtro || evento.button !== 0 || evento.ctrlKey || evento.metaKey || evento.shiftKey || evento.altKey) return;
     evento.preventDefault();
+    if (filtro.hasAttribute("aria-current") && !solicitudActual) return;
     cargarColeccion(new URL(filtro.href), true);
 });
 window.addEventListener("popstate", () => {
-    leyendo?.abort();
+    solicitudActual?.abort();
     const destino = new URL(location.href);
     if (destino.searchParams.get("categoria") !== categoriaMostrada) cargarColeccion(destino, false);
 });
 
-const enlacesCajas = [...document.querySelectorAll(".indice-cajas a")];
-if (enlacesCajas.length) {
-    const lista = document.querySelector(".cajas-lista");
-    const tarjetas = enlacesCajas.map(enlace => document.getElementById(enlace.hash.slice(1)));
-    function marcarCaja(indice) {
-        enlacesCajas.forEach((enlace, posicion) => {
-            if (indice === posicion) enlace.setAttribute("aria-current", "true");
-            else enlace.removeAttribute("aria-current");
-        });
-    }
-    marcarCaja(0);
-    if ("IntersectionObserver" in window) {
-        const proporciones = new Map();
-        const observarCajas = new IntersectionObserver(entradas => {
-            for (const entrada of entradas) proporciones.set(entrada.target, entrada.intersectionRatio);
-            const principal = tarjetas.reduce((a, b) => (proporciones.get(a) || 0) >= (proporciones.get(b) || 0) ? a : b);
-            if (proporciones.get(principal) > 0) marcarCaja(tarjetas.indexOf(principal));
-        }, { threshold: [0, .25, .5, .75, 1] });
-        tarjetas.forEach(tarjeta => observarCajas.observe(tarjeta));
-    }
-    enlacesCajas.forEach((enlace, indice) => enlace.addEventListener("click", evento => {
-        if (!matchMedia("(max-width: 760px)").matches || evento.ctrlKey || evento.metaKey || evento.shiftKey || evento.altKey) return;
-        evento.preventDefault();
-        lista.scrollTo({ left: tarjetas[indice].offsetLeft - tarjetas[0].offsetLeft,
-            behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
-        marcarCaja(indice);
-    }));
+const momento = document.querySelector("[data-momento-cajas]");
+if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const observar = new IntersectionObserver((entradas, observador) => {
+        if (!entradas.some(entrada => entrada.isIntersecting)) return;
+        momento.classList.add("momento-visible");
+        observador.disconnect();
+    }, { threshold: .18 });
+    observar.observe(momento);
 }

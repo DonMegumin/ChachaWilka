@@ -1,6 +1,6 @@
 @model LoginVM
 @{ ViewData["Title"] = "Ingresar"; }
-<section class="marco pagina acceso">
+<section class="marco pagina acceso" data-entrada-formulario>
     <figure class="acceso-foto"><img src="~/images/chachawillka/combo-licores-2.jpg" alt="Colección de licores artesanales" width="640" height="383" /></figure>
     <div class="panel">
         <h1>Ingresa a tu cuenta</h1>
@@ -13,7 +13,7 @@
             <label asp-for="Contraseña"></label>
             <input asp-for="Contraseña" autocomplete="current-password" required />
             <span asp-validation-for="Contraseña" class="validacion"></span>
-            <button class="boton boton-primario" type="submit">Ingresar <span aria-hidden="true">↗</span></button>
+            <button class="boton boton-primario" type="submit">Ingresar <span class="flecha" aria-hidden="true"></span></button>
         </form>
         <p>¿Primera vez? <a class="subrayado" asp-action="Registro">Crea una cuenta.</a></p>
     </div>

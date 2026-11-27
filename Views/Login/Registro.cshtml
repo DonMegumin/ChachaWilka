@@ -1,6 +1,6 @@
 @model UsuarioVM
 @{ ViewData["Title"] = "Crear cuenta"; }
-<section class="marco pagina acceso">
+<section class="marco pagina acceso" data-entrada-formulario>
     <figure class="acceso-foto"><img src="~/images/chachawillka/combo-cremas-2.jpg" alt="Colección de cremas artesanales" width="640" height="853" /></figure>
     <div class="panel">
         <h1>Crea tu cuenta</h1>
@@ -27,7 +27,7 @@
             <span asp-validation-for="RepiteContraseña" class="validacion"></span>
             <label class="casilla"><input asp-for="Consentimiento" required /><span>Acepto el uso de mis datos para gestionar mis pedidos según el <a class="subrayado" asp-controller="Home" asp-action="Privacy">aviso de privacidad</a>.</span></label>
             <span asp-validation-for="Consentimiento" class="validacion"></span>
-            <button class="boton boton-primario" type="submit">Crear cuenta <span aria-hidden="true">↗</span></button>
+            <button class="boton boton-primario" type="submit">Crear cuenta <span class="flecha" aria-hidden="true"></span></button>
         </form>
         <p>¿Ya tienes cuenta? <a class="subrayado" asp-action="Login">Ingresa aquí.</a></p>
     </div>
