@@ -126,7 +126,9 @@ form { margin: 0; }
 .regreso:hover { color: var(--ink); text-decoration: underline; }
 .acceso, .composicion { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(1.3rem, 5vw, 4.3rem); align-items: start; }
 .acceso-foto, .composicion-foto { display: grid; overflow: hidden; position: sticky; top: 1rem; background: var(--paper); }
-.acceso-foto img, .composicion-foto img { width: 100%; height: clamp(360px, 45vw, 665px); object-fit: cover; }
+.acceso-foto img { width: 100%; height: clamp(360px, 45vw, 665px); object-fit: cover; }
+.composicion-foto img { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; }
+.composicion-foto figcaption { padding: .62rem .85rem; color: var(--muted); font-size: .85rem; }
 .acceso-foto { border-top-left-radius: 90px; }
 .acceso h1, .composicion h1 { font-size: clamp(2.5rem, 5.1vw, 4.5rem); }
 .panel { min-width: 0; background: var(--white); border: 1px solid var(--line); padding: clamp(1rem, 3.3vw, 2.25rem); }
@@ -223,7 +225,7 @@ td summary { font-weight: 700; }
     .producto-acciones strong, .stock { font-size: .77rem; }
     .cajas-lista, .visita { grid-template-columns: minmax(0, 1fr); }
     .acceso-foto, .composicion-foto { position: static; }
-    .acceso-foto img, .composicion-foto img { height: clamp(160px, 47vw, 280px); }
+    .acceso-foto img { height: clamp(160px, 47vw, 280px); }
     .acceso-foto { border-top-left-radius: 52px; }
     .pagina .seccion-cabecera { align-items: flex-start; }
     .pie-interior { gap: 1rem; }

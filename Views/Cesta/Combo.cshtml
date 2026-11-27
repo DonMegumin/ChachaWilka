@@ -4,7 +4,8 @@
     <a class="regreso" asp-controller="Home" asp-action="Index" asp-fragment="cajas">← Volver a las cajas</a>
     <div class="composicion">
         <figure class="composicion-foto">
-            <img src="~/images/chachawillka/@(Model.Categoria == CatalogoMarca.Cremas ? "combo-cremas-2.jpg" : "combo-licores-2.jpg")" alt="Caja de @Model.Categoria.ToLowerInvariant()" width="640" height="600" />
+            <img src="~/images/chachawillka/@(Model.Categoria == CatalogoMarca.Cremas ? "caja-cremas.webp" : "caja-licores.webp")" alt="Ejemplo de una caja ChachaWillka con cuatro botellas de @Model.Categoria.ToLowerInvariant()" width="1200" height="800" />
+            <figcaption>Presentación referencial. Tú eliges los sabores.</figcaption>
         </figure>
         <div class="panel">
             <p class="detalle-categoria">Elige cuatro sabores</p>

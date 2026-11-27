@@ -87,11 +87,11 @@
             <div><h2 id="cajas-titulo">De cuatro en cuatro.</h2><p>Elige cuatro sabores de una misma colección y arma tu caja.</p></div>
         </div>
         <div class="cajas-lista">
-            @foreach (var caja in new[] { (Nombre: "Licores", Foto: "combo-licores-2.jpg", Precio: Model.Ajustes.PrecioCombo), (Nombre: "Cremas", Foto: "combo-cremas-2.jpg", Precio: Model.Ajustes.PrecioComboCremas) })
+            @foreach (var caja in new[] { (Nombre: "Licores", Foto: "caja-licores.webp", Precio: Model.Ajustes.PrecioCombo), (Nombre: "Cremas", Foto: "caja-cremas.webp", Precio: Model.Ajustes.PrecioComboCremas) })
             {
                 @if (caja.Precio <= 0) { continue; }
                 <article class="caja">
-                    <img src="~/images/chachawillka/@caja.Foto" alt="Selección de @caja.Nombre.ToLowerInvariant() de ChachaWillka" width="640" height="430" loading="lazy" />
+                    <img src="~/images/chachawillka/@caja.Foto" alt="Ejemplo de una caja ChachaWillka con cuatro botellas de @caja.Nombre.ToLowerInvariant()" width="1200" height="800" loading="lazy" />
                     <div>
                         <h3>Caja de @caja.Nombre.ToLowerInvariant()</h3>
                         <p>4 unidades · S/ @caja.Precio.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)</p>
