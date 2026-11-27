@@ -1,8 +1,37 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Inicio";
+    Layout = null;
+    bool autenticado = User.Identity?.IsAuthenticated ?? false;
 }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ChachaWilka</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body>
+    <div class="d-flex justify-content-end p-3">
+        @if (autenticado)
+        {
+            <form asp-controller="Login" asp-action="Logout" method="post" class="d-flex align-items-center gap-2">
+                <span>@User.Identity!.Name</span>
+                <button type="submit" class="btn btn-outline-dark btn-sm">Cerrar sesión</button>
+            </form>
+        }
+        else
+        {
+            <a asp-controller="Login" asp-action="Login" class="btn btn-outline-dark btn-sm">Iniciar sesión</a>
+        }
+    </div>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+    <main class="container text-center py-5">
+        <p class="text-uppercase small mb-2">Licores y Cremas</p>
+        <h1 class="display-1 mb-3"><strong>Chacha</strong><em>Willka</em></h1>
+        <p class="fst-italic fs-4">El sabor tradicional, guardado en cada botella.</p>
+    </main>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
