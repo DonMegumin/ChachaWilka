@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ChachaWilka.Models
@@ -12,6 +12,6 @@ namespace ChachaWilka.Models
         public DateOnly Fecha_Reporte { get; set; }
         //Reporte M:1 Usuario
         public int Id_Usuario { get; set; }
-        public Usuario Usuarios { get; set; }
+        public Usuario Usuarios { get; set; } = null!;
     }
 }

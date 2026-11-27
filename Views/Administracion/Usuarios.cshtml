@@ -1,0 +1,50 @@
+@model IReadOnlyList<Usuario>
+@{ ViewData["Title"] = "Cuentas"; }
+<section class="marco pagina">
+    <a class="regreso" asp-action="Index">← Administración</a>
+    <h1>Cuentas</h1>
+    <div class="dos-columnas">
+        <div class="panel">
+            <h2>Cuentas registradas</h2>
+            @foreach (var cuenta in Model)
+            {
+                <article class="cuenta-admin">
+                    <h3>@cuenta.Nombre</h3><p>@cuenta.Correo</p>
+                    @if (!cuenta.TieneHash)
+                    {
+                        <details><summary>Recuperar cuenta histórica</summary>
+                            <p>Verifica la identidad del titular antes de crear una contraseña inicial.</p>
+                            <form asp-action="RecuperarUsuario" asp-route-id="@cuenta.Id_Usuario" method="post" class="formulario">
+                                <label for="recuperar-@cuenta.Id_Usuario">Contraseña inicial</label>
+                                <input id="recuperar-@cuenta.Id_Usuario" name="clave" type="password" minlength="12" maxlength="128" autocomplete="new-password" required />
+                                <button class="boton boton-secundario" type="submit">Recuperar como cliente</button>
+                            </form>
+                        </details>
+                    }
+                    else
+                    {
+                        <form asp-action="CambiarCuenta" asp-route-id="@cuenta.Id_Usuario" method="post" class="form-linea">
+                            <label class="solo-lectura" for="rol-@cuenta.Id_Usuario">Rol de @cuenta.Nombre</label>
+                            <select id="rol-@cuenta.Id_Usuario" name="rol">
+                                @foreach (var rol in new[] { RolesTienda.Cliente, RolesTienda.Empleado, RolesTienda.Administrador })
+                                { <option value="@rol" selected="@(cuenta.Rol.Nombre_Rol == rol)">@rol</option> }
+                            </select>
+                            <label class="casilla"><input type="checkbox" name="activo" value="true" checked="@cuenta.Activo" /> Activa</label>
+                            <button type="submit" class="boton boton-secundario">Guardar</button>
+                        </form>
+                    }
+                </article>
+            }
+        </div>
+        <aside class="panel">
+            <h2>Crear cuenta de personal</h2>
+            <form asp-action="CrearPersonal" method="post" class="formulario">
+                <label for="Nombre">Nombre</label><input id="Nombre" name="Nombre" maxlength="50" required />
+                <label for="Correo">Correo</label><input id="Correo" name="Correo" type="email" maxlength="100" required />
+                <label for="Clave">Contraseña inicial</label><input id="Clave" name="Clave" type="password" autocomplete="new-password" minlength="12" maxlength="128" required />
+                <label for="Rol">Rol</label><select id="Rol" name="Rol"><option>Empleado</option><option>Administrador</option></select>
+                <button type="submit" class="boton boton-primario">Crear cuenta ↗</button>
+            </form>
+        </aside>
+    </div>
+</section>

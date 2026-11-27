@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ChachaWilka.Models
@@ -12,6 +12,6 @@ namespace ChachaWilka.Models
         [StringLength(50)]
         public string Nombre_Rol { get; set; } = string.Empty;
         //1:M
-        public ICollection<Usuario> Usuarios { get; set; }
+        public ICollection<Usuario> Usuarios { get; set; } = [];
     }
 }

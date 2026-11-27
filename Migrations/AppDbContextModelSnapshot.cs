@@ -22,6 +22,85 @@ namespace ChachaWilka.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ChachaWilka.Models.AjustesTienda", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Direccion")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("Horario")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<bool>("PermitirRepeticiones")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("PrecioCombo")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PrecioComboCremas")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("TitularYape")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<byte[]>("Version")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("WhatsApp")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Yape")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Ajustes");
+                });
+
+            modelBuilder.Entity("ChachaWilka.Models.CambioCuenta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Accion")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("ActorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CuentaId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("Fecha")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CambiosCuenta");
+                });
+
             modelBuilder.Entity("ChachaWilka.Models.Categoria", b =>
                 {
                     b.Property<int>("Id_Categoria")
@@ -29,6 +108,11 @@ namespace ChachaWilka.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id_Categoria"));
+
+                    b.Property<bool>("Activa")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("Nombre_Categoria")
                         .IsRequired()
@@ -62,11 +146,54 @@ namespace ChachaWilka.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<decimal>("Precio_Combo")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id_Combo");
 
                     b.ToTable("combos");
+                });
+
+            modelBuilder.Entity("ChachaWilka.Models.ConsultaPedido", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("Creada")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("PedidoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Pregunta")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset?>("Respondida")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("ResponsableId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Respuesta")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<byte[]>("Version")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PedidoId");
+
+                    b.ToTable("Consultas");
                 });
 
             modelBuilder.Entity("ChachaWilka.Models.DetalleCombo", b =>
@@ -106,16 +233,27 @@ namespace ChachaWilka.Migrations
                     b.Property<int>("Cantidad")
                         .HasColumnType("int");
 
+                    b.Property<string>("GrupoCombo")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<int>("Id_Pedido")
                         .HasColumnType("int");
 
                     b.Property<int>("Id_Producto")
                         .HasColumnType("int");
 
+                    b.Property<string>("NombreHistorico")
+                        .IsRequired()
+                        .HasMaxLength(70)
+                        .HasColumnType("nvarchar(70)");
+
                     b.Property<decimal>("Precio")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Subtotal")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id_DetallePedido");
@@ -125,6 +263,73 @@ namespace ChachaWilka.Migrations
                     b.HasIndex("Id_Producto");
 
                     b.ToTable("detallePedidos");
+                });
+
+            modelBuilder.Entity("ChachaWilka.Models.EventoPedido", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ActorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<DateTimeOffset>("Fecha")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("PedidoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PedidoId");
+
+                    b.ToTable("Historial");
+                });
+
+            modelBuilder.Entity("ChachaWilka.Models.MovimientoInventario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ActorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ExistenciaDelta")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("Fecha")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Motivo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("PedidoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReservaDelta")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductoId", "Fecha");
+
+                    b.ToTable("Movimientos");
                 });
 
             modelBuilder.Entity("ChachaWilka.Models.Pago", b =>
@@ -143,6 +348,9 @@ namespace ChachaWilka.Migrations
                     b.Property<bool>("EstadoPago")
                         .HasColumnType("bit");
 
+                    b.Property<byte[]>("Evidencia")
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<DateOnly>("FechaPago")
                         .HasColumnType("date");
 
@@ -158,15 +366,56 @@ namespace ChachaWilka.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<decimal>("Monto")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Motivo")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("Referencia")
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<DateTimeOffset?>("Revisado")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("RevisorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Situacion")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)")
+                        .HasDefaultValue("Historico");
+
+                    b.Property<string>("TipoArchivo")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<byte[]>("Version")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.HasKey("Id_Pago");
 
-                    b.HasIndex("Id_Pedido");
-
                     b.HasIndex("Id_Usuario");
 
-                    b.ToTable("pagos");
+                    b.HasIndex("Referencia")
+                        .IsUnique()
+                        .HasFilter("[Referencia] IS NOT NULL");
+
+                    b.HasIndex(new[] { "Id_Pedido" }, "IX_pagos_Pedido_Verificado")
+                        .IsUnique()
+                        .HasFilter("[Situacion] = N'Verificado'");
+
+                    b.ToTable("pagos", t =>
+                        {
+                            t.HasCheckConstraint("CK_pagos_Evidencia", "[Situacion] = N'Historico' OR [Referencia] IS NOT NULL OR [Evidencia] IS NOT NULL");
+                        });
                 });
 
             modelBuilder.Entity("ChachaWilka.Models.Pedido", b =>
@@ -177,6 +426,16 @@ namespace ChachaWilka.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id_Pedido"));
 
+                    b.Property<Guid?>("ClaveConfirmacion")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Codigo")
+                        .HasMaxLength(24)
+                        .HasColumnType("nvarchar(24)");
+
+                    b.Property<DateTimeOffset>("Creado")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<bool>("Estado")
                         .HasColumnType("bit");
 
@@ -186,12 +445,37 @@ namespace ChachaWilka.Migrations
                     b.Property<int>("Id_Usuario")
                         .HasColumnType("int");
 
+                    b.Property<DateTimeOffset?>("Retirado")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Situacion")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)")
+                        .HasDefaultValue("Historico");
+
                     b.Property<decimal>("Total")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<byte[]>("Version")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.HasKey("Id_Pedido");
 
-                    b.HasIndex("Id_Usuario");
+                    b.HasIndex("Codigo")
+                        .IsUnique()
+                        .HasFilter("[Codigo] IS NOT NULL");
+
+                    b.HasIndex("Id_Usuario", "ClaveConfirmacion")
+                        .IsUnique()
+                        .HasFilter("[ClaveConfirmacion] IS NOT NULL");
+
+                    b.HasIndex("Situacion", "Creado");
 
                     b.ToTable("pedidos");
                 });
@@ -203,6 +487,11 @@ namespace ChachaWilka.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id_Producto"));
+
+                    b.Property<bool>("Activo")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("Categoria")
                         .IsRequired()
@@ -217,22 +506,48 @@ namespace ChachaWilka.Migrations
                     b.Property<int>("Id_Categoria")
                         .HasColumnType("int");
 
+                    b.Property<string>("Imagen")
+                        .IsRequired()
+                        .HasMaxLength(140)
+                        .HasColumnType("nvarchar(140)");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<decimal>("Precio")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ReferenciaCatalogo")
+                        .HasMaxLength(70)
+                        .HasColumnType("nvarchar(70)");
+
+                    b.Property<int>("Reservado")
+                        .HasColumnType("int");
 
                     b.Property<int>("Stock")
                         .HasColumnType("int");
+
+                    b.Property<byte[]>("Version")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.HasKey("Id_Producto");
 
                     b.HasIndex("Id_Categoria");
 
-                    b.ToTable("productos");
+                    b.HasIndex("ReferenciaCatalogo")
+                        .IsUnique()
+                        .HasFilter("[ReferenciaCatalogo] IS NOT NULL");
+
+                    b.ToTable("productos", t =>
+                        {
+                            t.HasCheckConstraint("CK_productos_Stock", "[Stock] >= 0 AND [Reservado] >= 0 AND [Reservado] <= [Stock]");
+                        });
                 });
 
             modelBuilder.Entity("ChachaWilka.Models.Reporte", b =>
@@ -286,12 +601,25 @@ namespace ChachaWilka.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id_Usuario"));
 
+                    b.Property<bool>("Activo")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTimeOffset?>("Consentimiento")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("Contraseña")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
 
                     b.Property<string>("Correo")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("CorreoNormalizado")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -300,16 +628,48 @@ namespace ChachaWilka.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("int");
 
+                    b.Property<bool>("MayorDeEdad")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("Telefono")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<bool>("TieneHash")
+                        .HasColumnType("bit");
+
+                    b.Property<byte[]>("Version")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.HasKey("Id_Usuario");
+
+                    b.HasIndex("CorreoNormalizado")
+                        .IsUnique()
+                        .HasFilter("[TieneHash] = 1");
 
                     b.HasIndex("Id_Rol");
 
                     b.ToTable("usuarios");
+                });
+
+            modelBuilder.Entity("ChachaWilka.Models.ConsultaPedido", b =>
+                {
+                    b.HasOne("ChachaWilka.Models.Pedido", "Pedido")
+                        .WithMany("Consultas")
+                        .HasForeignKey("PedidoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Pedido");
                 });
 
             modelBuilder.Entity("ChachaWilka.Models.DetalleCombo", b =>
@@ -348,6 +708,26 @@ namespace ChachaWilka.Migrations
                     b.Navigation("Pedidos");
 
                     b.Navigation("Productos");
+                });
+
+            modelBuilder.Entity("ChachaWilka.Models.EventoPedido", b =>
+                {
+                    b.HasOne("ChachaWilka.Models.Pedido", null)
+                        .WithMany("Historial")
+                        .HasForeignKey("PedidoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ChachaWilka.Models.MovimientoInventario", b =>
+                {
+                    b.HasOne("ChachaWilka.Models.Producto", "Producto")
+                        .WithMany()
+                        .HasForeignKey("ProductoId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Producto");
                 });
 
             modelBuilder.Entity("ChachaWilka.Models.Pago", b =>
@@ -425,7 +805,11 @@ namespace ChachaWilka.Migrations
 
             modelBuilder.Entity("ChachaWilka.Models.Pedido", b =>
                 {
+                    b.Navigation("Consultas");
+
                     b.Navigation("DetallePedidos");
+
+                    b.Navigation("Historial");
 
                     b.Navigation("Pagos");
                 });

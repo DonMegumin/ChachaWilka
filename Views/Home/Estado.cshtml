@@ -1,0 +1,6 @@
+@{ ViewData["Title"] = "Página no disponible"; }
+<section class="marco pagina pagina-estrecha">
+    <h1>@(ViewData["Codigo"] is 404 ? "No encontramos esa página." : "No pudimos completar la solicitud.")</h1>
+    <p>Vuelve a la colección o intenta nuevamente.</p>
+    <a class="boton boton-primario" asp-controller="Home" asp-action="Index">Ir al inicio</a>
+</section>

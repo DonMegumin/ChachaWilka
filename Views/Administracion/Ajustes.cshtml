@@ -1,0 +1,22 @@
+@model AjustesTienda
+@{ ViewData["Title"] = "Ajustes de la tienda"; }
+<section class="marco pagina pagina-estrecha">
+    <a class="regreso" asp-action="Index">← Administración</a>
+    <div class="panel">
+        <h1>Ajustes de la tienda</h1>
+        <form asp-action="Ajustes" method="post" class="formulario">
+            <div asp-validation-summary="All" class="validacion" role="alert"></div>
+            <input type="hidden" name="versionActual" value="@(ViewData["VersionActual"] ?? Convert.ToBase64String(Model.Version))" />
+            <label asp-for="Yape">Número de Yape</label><input asp-for="Yape" inputmode="numeric" maxlength="9" />
+            <label asp-for="TitularYape">Titular de Yape (opcional)</label><input asp-for="TitularYape" maxlength="80" />
+            <label asp-for="Direccion">Dirección de recojo</label><input asp-for="Direccion" required maxlength="150" />
+            <label asp-for="Horario">Horario de recojo</label><input asp-for="Horario" maxlength="120" />
+            <label asp-for="WhatsApp">WhatsApp con código de país</label><input asp-for="WhatsApp" inputmode="numeric" maxlength="20" />
+            <label asp-for="PrecioCombo">Precio de caja de licores (S/)</label><input asp-for="PrecioCombo" type="number" min="0" max="10000" step="0.01" />
+            <label asp-for="PrecioComboCremas">Precio de caja de cremas (S/)</label><input asp-for="PrecioComboCremas" type="number" min="0" max="10000" step="0.01" />
+            <p class="nota">Para ocultar una caja, configura su precio en cero.</p>
+            <label class="casilla"><input asp-for="PermitirRepeticiones" /> Permitir sabores repetidos en una caja</label>
+            <button type="submit" class="boton boton-primario">Guardar ajustes ↗</button>
+        </form>
+    </div>
+</section>

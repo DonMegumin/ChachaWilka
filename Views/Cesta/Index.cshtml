@@ -1,0 +1,83 @@
+@model CestaVM
+@{
+    ViewData["Title"] = "Tu cesta";
+    var seleccion = Model.Carrito.Seleccion;
+    var puedeComprar = User.IsInRole(RolesTienda.Cliente);
+}
+<section class="marco pagina">
+    <a class="regreso" asp-controller="Home" asp-action="Index" asp-fragment="coleccion">← Seguir explorando</a>
+    <h1>Tu cesta</h1>
+    @if (Model.Carrito.Cantidad == 0)
+    {
+        <div class="cesta-vacia">
+            <img src="~/images/chachawillka/combo-licores-2.jpg" alt="La colección de licores ChachaWillka" width="640" height="383" />
+            <div><h2>Tu cesta está vacía.</h2><p>Elige un licor, una crema o arma tu propia caja.</p>
+            <a class="boton boton-primario" asp-controller="Home" asp-action="Index" asp-fragment="coleccion">Ir a la colección <span aria-hidden="true">↗</span></a></div>
+        </div>
+    }
+    else
+    {
+        <div class="dos-columnas">
+            <div class="panel">
+                <h2>Tus productos</h2>
+                @foreach (var mensaje in Model.Carrito.Errores) { <p class="aviso aviso-error" role="alert">@mensaje</p> }
+                @foreach (var par in seleccion.Botellas)
+                {
+                    var linea = Model.Carrito.Lineas.FirstOrDefault(l => l.Combo == null && l.Producto.Id_Producto == par.Key);
+                    <article class="linea-cesta">
+                        <div><h3>@(linea?.Producto.Nombre ?? "Producto fuera de catálogo")</h3>
+                        @if (linea != null) { <p>S/ @linea.Precio.ToString("0.00") por unidad</p> }</div>
+                        @if (linea != null)
+                        {
+                            <form asp-action="Cambiar" method="post" class="form-linea">
+                                <input type="hidden" name="id" value="@par.Key" />
+                                <input class="cantidad" type="number" name="cantidad" min="1" max="99" value="@par.Value" aria-label="Cantidad de @linea.Producto.Nombre" required />
+                                <button class="enlace subrayado" type="submit">Actualizar</button>
+                            </form>
+                        }
+                        <form asp-action="Quitar" method="post">
+                            <input type="hidden" name="id" value="@par.Key" />
+                            <button class="enlace subrayado" type="submit">Retirar</button>
+                        </form>
+                    </article>
+                }
+                @foreach (var combo in seleccion.Combos)
+                {
+                    <article class="linea-cesta">
+                        <div><h3>Caja de @combo.Categoria.ToLowerInvariant()</h3>
+                        <p>@string.Join(", ", combo.Sabores.Select(id => Model.Carrito.Lineas.FirstOrDefault(l => l.Producto.Id_Producto == id)?.Producto.Nombre ?? "Sabor no disponible"))</p></div>
+                        <form asp-action="Quitar" method="post">
+                            <input type="hidden" name="combo" value="@combo.Id" />
+                            <button class="enlace subrayado" type="submit">Retirar</button>
+                        </form>
+                    </article>
+                }
+            </div>
+            <aside class="panel resumen">
+                <h2>Resumen</h2>
+                <p>@Model.Carrito.Cantidad unidades · Recojo en el local</p>
+                <p>@Model.Ajustes.Direccion<br />@Model.Ajustes.Horario</p>
+                <div class="total"><span>Total</span><strong>S/ @Model.Carrito.Total.ToString("0.00")</strong></div>
+                @if (Model.Carrito.Errores.Count == 0 && !string.IsNullOrWhiteSpace(Model.Ajustes.Yape))
+                {
+                    @if (puedeComprar)
+                    {
+                        <form asp-action="Confirmar" method="post">
+                            <input type="hidden" name="clave" value="@seleccion.Confirmacion" />
+                            <input type="hidden" name="totalCentimos" value="@((long)(Model.Carrito.Total * 100))" />
+                            <button class="boton boton-primario" type="submit" data-enviar="Confirmando…">Confirmar pedido ↗</button>
+                        </form>
+                    }
+                    else if (User.Identity?.IsAuthenticated != true)
+                    {
+                        <a class="boton boton-primario" asp-controller="Login" asp-action="Login" asp-route-returnUrl="@Url.Action("Index", "Cesta")">Ingresa para confirmar ↗</a>
+                    }
+                }
+                else if (string.IsNullOrWhiteSpace(Model.Ajustes.Yape))
+                {
+                    <p class="nota">El negocio está configurando el pago por Yape.</p>
+                }
+            </aside>
+        </div>
+    }
+</section>

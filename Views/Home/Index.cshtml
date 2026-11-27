@@ -1,67 +1,74 @@
-﻿@{
-    ViewData["Title"] = "Inicio";
-    Layout = null;
-    bool autenticado = User.Identity?.IsAuthenticated ?? false;
+@model PortadaVM
+@{
+    ViewData["Title"] = "Licores y cremas de Chachapoyas";
+    ViewData["Portada"] = true;
+    var personal = User.IsInRole(RolesTienda.Administrador) || User.IsInRole(RolesTienda.Empleado);
+    var cajas = new[] {
+        (Nombre: "Licores", Foto: "caja-licores.webp", Precio: Model.Ajustes.PrecioCombo),
+        (Nombre: "Cremas", Foto: "caja-cremas.webp", Precio: Model.Ajustes.PrecioComboCremas)
+    }.Where(c => c.Precio > 0).ToArray();
 }
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ChachaWilka</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@1&family=Playfair+Display:ital,wght@0,900;1,400&family=Space+Mono&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
-</head>
-<body class="cw-home">
-    <section class="cw-hero">
-
-        <!-- Iniciar sesión / Cerrar sesión -->
-        <div class="cw-login">
-            @if (autenticado)
-            {
-                <span>@User.Identity!.Name</span>
-                <form asp-controller="Login" asp-action="Logout" method="post">
-                    <button type="submit" class="cw-boton">Cerrar sesión</button>
-                </form>
-            }
-            else
-            {
-                <a asp-controller="Login" asp-action="Login" class="cw-boton">Iniciar sesión</a>
-            }
+<partial name="_Escena" />
+<partial name="_Coleccion" model="Model" />
+<p class="solo-lectura" data-resultado role="status"></p>
+<dialog class="ficha" aria-labelledby="ficha-nombre" data-ficha>
+    <div class="ficha-interior">
+        <div class="ficha-foto" data-ficha-foto></div>
+        <div class="ficha-texto">
+            <p class="detalle-categoria" data-ficha-categoria></p>
+            <h2 id="ficha-nombre"></h2>
+            <p data-ficha-descripcion></p>
+            <div class="producto-acciones" data-ficha-acciones></div>
         </div>
-
-        <div class="cw-contenido">
-            <!-- Botella -->
-            <svg class="cw-botella" viewBox="0 0 46 112" fill="none" stroke="#3b342b" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
-                <circle cx="23" cy="9" r="7" />
-                <path d="M17 14 C17 20 8 22 8 30 V100 a8 8 0 0 0 8 8 H30 a8 8 0 0 0 8 -8 V30 C38 22 29 20 29 14" />
-                <line x1="15" y1="38" x2="31" y2="38" />
-                <line x1="15" y1="57" x2="31" y2="57" />
-                <line x1="15" y1="76" x2="31" y2="76" />
-            </svg>
-
-            <p class="cw-etiqueta">Licores y Cremas</p>
-            <h1 class="cw-titulo">Chacha<em>Willka</em></h1>
-            <p class="cw-lema">El sabor tradicional, guardado en cada botella.</p>
-
-            <!-- Rombos -->
-            <div class="cw-rombos" aria-hidden="true">
-                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        <form method="dialog"><button type="submit" class="cerrar-ficha" aria-label="Cerrar ficha" autofocus>×</button></form>
+    </div>
+</dialog>
+<section class="cajas" id="cajas" aria-labelledby="cajas-titulo">
+    <div class="marco seccion">
+        <div class="seccion-cabecera">
+            <div><h2 id="cajas-titulo">Cuatro sabores,<br /><em>una caja.</em></h2><p>Elige cuatro sabores de una misma colección y arma tu caja.</p>
+                @if (cajas.Length > 1)
+                {
+                    <nav class="indice-cajas" aria-label="Presentaciones de caja">
+                        @foreach (var caja in cajas)
+                        {
+                            <a href="#caja-@caja.Nombre.ToLowerInvariant()">@caja.Nombre</a>
+                        }
+                    </nav>
+                }
             </div>
-
-            <a href="#coleccion" class="cw-boton">Ver la colección ↓</a>
         </div>
-
-        <!-- Montañas -->
-        <svg class="cw-montanas" viewBox="0 430 1526 315" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-            <polygon class="m1" points="0,540 100,590 250,467 420,590 565,438 740,540 885,480 1040,580 1213,460 1380,565 1526,510 1526,745 0,745" />
-            <polygon class="m2" points="0,610 55,567 168,692 365,538 450,678 690,581 745,692 1015,567 1043,678 1355,595 1500,660 1526,665 1526,745 0,745" />
-            <polygon class="m3" points="0,650 42,623 165,690 310,595 450,680 605,637 750,690 902,608 1045,680 1200,645 1355,700 1526,652 1526,745 0,745" />
-        </svg>
-    </section>
-
-    <section id="coleccion"></section>
-</body>
-</html>
+        <div class="cajas-lista">
+            @if (cajas.Length == 0)
+            {
+                <p>Por el momento no hay cajas disponibles.</p>
+            }
+            @foreach (var caja in cajas)
+            {
+                <article class="caja" id="caja-@caja.Nombre.ToLowerInvariant()">
+                    <img src="~/images/chachawillka/@caja.Foto" alt="Ejemplo de una caja ChachaWillka con cuatro botellas de @caja.Nombre.ToLowerInvariant()" width="1200" height="800" loading="lazy" />
+                    <div>
+                        <h3>Caja de @caja.Nombre.ToLowerInvariant()</h3>
+                        <p>4 unidades · S/ @caja.Precio.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)</p>
+                        @if (Model.Disponible && !personal)
+                        {
+                            <a class="boton boton-linea" asp-controller="Cesta" asp-action="Combo" asp-route-categoria="@caja.Nombre">Armar mi caja <span aria-hidden="true">↗</span></a>
+                        }
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+<section class="marco seccion visita" id="recojo">
+    <div><p class="detalle-categoria">Visítanos</p><h2>Nos vemos en<br /><em>Chachapoyas.</em></h2></div>
+    <div>
+        <h3>Recojo en el local</h3>
+        <p>@Model.Ajustes.Direccion</p>
+        @if (!string.IsNullOrWhiteSpace(Model.Ajustes.Horario)) { <p>@Model.Ajustes.Horario</p> }
+        @if (!string.IsNullOrWhiteSpace(Model.Ajustes.WhatsApp))
+        {
+            <a class="enlace-flecha" href="https://wa.me/@Model.Ajustes.WhatsApp" target="_blank" rel="noopener noreferrer">Consultar por WhatsApp ↗</a>
+        }
+    </div>
+</section>

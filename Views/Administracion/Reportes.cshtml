@@ -1,0 +1,33 @@
+@model ReportesVM
+@{ ViewData["Title"] = "Reportes"; }
+<section class="marco pagina">
+    <a class="regreso" asp-action="Index">← Administración</a>
+    <h1>Reportes</h1>
+    <form asp-action="Reportes" method="get" class="form-linea filtro-interno">
+        <label for="desde">Desde</label><input type="date" name="desde" id="desde" value="@Model.Desde.ToString("yyyy-MM-dd")" required />
+        <label for="hasta">Hasta</label><input type="date" name="hasta" id="hasta" value="@Model.Hasta.ToString("yyyy-MM-dd")" required />
+        <button class="boton boton-secundario" type="submit">Consultar</button>
+    </form>
+    <div class="modulos">
+        <section class="panel"><h2>Cobros verificados</h2><strong class="precio-destacado">S/ @Model.Cobrado.ToString("0.00")</strong><p>Según la fecha de verificación en Yape.</p></section>
+        <section class="panel"><h2>Ventas retiradas</h2><strong class="precio-destacado">S/ @Model.Vendido.ToString("0.00")</strong><p>Según la fecha de recojo en el local.</p></section>
+        <section class="panel"><h2>Pedidos por estado</h2>
+        @if (Model.Estados.Count == 0) { <p>No hubo pedidos en este período.</p> }
+        @foreach (var estado in Model.Estados) { <div class="linea-pedido"><span>@estado.Estado.Etiqueta()</span><strong>@estado.Cantidad</strong></div> }
+        </section>
+    </div>
+    <section class="margen-superior"><h2>Inventario actual</h2>
+        <div class="tabla-scroll"><table><thead><tr><th scope="col">Producto</th><th scope="col">Existencia</th><th scope="col">Reserva</th><th scope="col">Disponible</th></tr></thead><tbody>
+        @foreach (var p in Model.Inventario) { <tr><th scope="row">@p.Nombre</th><td>@p.Stock</td><td>@p.Reservado</td><td>@p.Disponible</td></tr> }
+        </tbody></table></div>
+    </section>
+    <section class="margen-superior"><h2>Movimientos del período</h2>
+        @if (Model.Movimientos.Count == 0) { <p>No hay movimientos para estas fechas.</p> }
+        else
+        {
+            <div class="tabla-scroll"><table><thead><tr><th scope="col">Fecha</th><th scope="col">Producto</th><th scope="col">Existencia</th><th scope="col">Reserva</th><th scope="col">Motivo</th></tr></thead><tbody>
+            @foreach (var m in Model.Movimientos) { <tr><td>@RelojTienda.EnLima(m.Fecha).ToString("dd/MM/yyyy HH:mm")</td><th scope="row">@m.Producto.Nombre</th><td>@m.ExistenciaDelta</td><td>@m.ReservaDelta</td><td>@m.Motivo</td></tr> }
+            </tbody></table></div>
+        }
+    </section>
+</section>

@@ -1,0 +1,13 @@
+@model IReadOnlyList<PedidoResumen>
+<div class="tabla-scroll">
+    <table>
+        <thead><tr><th scope="col">Código</th>@if (Model.Any(p => p.Cliente != null)) { <th scope="col">Cliente</th> }<th scope="col">Fecha</th><th scope="col">Estado</th><th scope="col">Total</th></tr></thead>
+        <tbody>
+            @foreach (var pedido in Model)
+            {
+                <tr><th scope="row"><a class="subrayado" asp-controller="Pedidos" asp-action="Detalle" asp-route-id="@pedido.Id">@(pedido.Codigo ?? $"#{pedido.Id}")</a></th>
+                @if (pedido.Cliente != null) { <td>@pedido.Cliente</td> }<td>@pedido.Fecha.ToString("dd/MM/yyyy")</td><td>@pedido.Estado.Etiqueta()</td><td>S/ @pedido.Total.ToString("0.00")</td></tr>
+            }
+        </tbody>
+    </table>
+</div>

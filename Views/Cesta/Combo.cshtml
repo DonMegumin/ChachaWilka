@@ -1,0 +1,49 @@
+@model ComboVM
+@{ ViewData["Title"] = "Armar caja"; }
+<section class="marco pagina">
+    <a class="regreso" asp-controller="Home" asp-action="Index" asp-fragment="cajas">← Volver a las cajas</a>
+    <div class="composicion">
+        <figure class="composicion-foto">
+            <img src="~/images/chachawillka/@(Model.Categoria == CatalogoMarca.Cremas ? "caja-cremas.webp" : "caja-licores.webp")" alt="Ejemplo de una caja ChachaWillka con cuatro botellas de @Model.Categoria.ToLowerInvariant()" width="1200" height="800" />
+            <figcaption>Presentación referencial. Tú eliges los sabores.</figcaption>
+        </figure>
+        <div class="panel">
+            <p class="detalle-categoria">Elige cuatro sabores</p>
+            <h1>Caja de @Model.Categoria.ToLowerInvariant()</h1>
+            <p class="precio-destacado">S/ @Model.Precio.ToString("0.00")</p>
+            @if (Model.Precio <= 0 || Model.Productos.Count < (Model.Repeticiones ? 1 : 4) || Model.Productos.Sum(p => p.Disponible) < 4)
+            {
+                <p class="nota">Esta caja estará disponible cuando haya suficientes sabores con stock.</p>
+            }
+            else
+            {
+                <p>@(Model.Repeticiones ? "Puedes repetir sabores si hay unidades disponibles." : "Elige cuatro sabores distintos.")</p>
+                <form asp-action="AgregarCombo" method="post" class="formulario" data-combo data-repeticiones="@Model.Repeticiones.ToString().ToLowerInvariant()">
+                    <input type="hidden" name="categoria" value="@Model.Categoria" />
+                    <div class="bandeja" data-bandeja hidden aria-hidden="true">
+                        @for (var i = 1; i <= 4; i++)
+                        {
+                            <div class="hueco"><span>@i.ToString("00")</span></div>
+                        }
+                    </div>
+                    <div class="selecciones">
+                        @for (var i = 1; i <= 4; i++)
+                        {
+                            <div><label for="sabor-@i">Sabor @i</label>
+                            <select id="sabor-@i" name="seleccion" required>
+                                <option value="">Seleccionar</option>
+                                @foreach (var producto in Model.Productos)
+                                {
+                                    <option value="@producto.Id_Producto" data-unidades="@producto.Disponible"
+                                            data-foto="@(string.IsNullOrWhiteSpace(producto.Imagen) ? null : Url.Content("~/images/chachawillka/" + producto.Imagen))">@producto.Nombre</option>
+                                }
+                            </select></div>
+                        }
+                    </div>
+                    <p class="combo-progreso" aria-live="polite" data-progreso>0 de 4 sabores seleccionados</p>
+                    <button class="boton boton-primario" type="submit">Añadir caja a la cesta <span aria-hidden="true">↗</span></button>
+                </form>
+            }
+        </div>
+    </div>
+</section>

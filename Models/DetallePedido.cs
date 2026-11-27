@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ChachaWilka.Models
@@ -14,11 +14,13 @@ namespace ChachaWilka.Models
         public decimal Precio { get; set; }
         [Required]
         public decimal Subtotal { get; set; }
+        [StringLength(70)] public string NombreHistorico { get; set; } = "";
+        [StringLength(100)] public string? GrupoCombo { get; set; }
         //DetallePedido M:1 Pedido
         public int Id_Pedido { get; set; }
-        public Pedido Pedidos { get; set; }
+        public Pedido Pedidos { get; set; } = null!;
         //DetallePedido M:1 Producto
         public int Id_Producto { get; set; }
-        public Producto Productos { get; set; }
+        public Producto Productos { get; set; } = null!;
     }
 }

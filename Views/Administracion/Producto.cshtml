@@ -1,0 +1,26 @@
+@model ProductoVM
+@{
+    ViewData["Title"] = ViewData["Id"] is int ? "Editar producto" : "Nuevo producto";
+    var categorias = (IReadOnlyList<Categoria>)ViewData["Categorias"]!;
+}
+<section class="marco pagina pagina-estrecha">
+    <a class="regreso" asp-action="Catalogo">← Catálogo e inventario</a>
+    <div class="panel">
+        <h1>@ViewData["Title"]</h1>
+        <form asp-action="Producto" asp-route-id="@ViewData["Id"]" method="post" class="formulario">
+            <div asp-validation-summary="All" class="validacion" role="alert"></div>
+            <input asp-for="Version" type="hidden" />
+            <label asp-for="Nombre"></label><input asp-for="Nombre" required maxlength="50" />
+            <label asp-for="Descripcion">Descripción</label><textarea asp-for="Descripcion" required maxlength="200"></textarea>
+            <label asp-for="CategoriaId">Categoría</label>
+            <select asp-for="CategoriaId" required><option value="">Seleccionar</option>
+                @foreach (var categoria in categorias) { <option value="@categoria.Id_Categoria">@categoria.Nombre_Categoria</option> }
+            </select>
+            <label asp-for="Precio">Precio en soles</label><input asp-for="Precio" type="number" step="0.01" min="0.01" max="99999" required />
+            <label asp-for="Imagen">Imagen de la marca</label>
+            <select asp-for="Imagen"><option value="">Sin imagen</option>@foreach (var imagen in (IReadOnlyList<string>)ViewData["Imagenes"]!) { <option value="@imagen">@imagen</option> }</select>
+            <label class="casilla"><input asp-for="Activo" /> Visible en el catálogo</label>
+            <button type="submit" class="boton boton-primario">Guardar producto ↗</button>
+        </form>
+    </div>
+</section>

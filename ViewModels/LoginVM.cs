@@ -1,8 +1,12 @@
-﻿namespace ChachaWilka.ViewModels
+using System.ComponentModel.DataAnnotations;
+
+namespace ChachaWilka.ViewModels;
+
+public sealed class LoginVM
 {
-    public class LoginVM
-    {
-        public string Correo { get; set; }
-        public string Contraseña { get; set; }
-    }
+    [Required, EmailAddress, StringLength(100)]
+    public string Correo { get; set; } = "";
+    [Required, StringLength(128), DataType(DataType.Password)]
+    public string Contraseña { get; set; } = "";
+    [StringLength(500)] public string? ReturnUrl { get; set; }
 }

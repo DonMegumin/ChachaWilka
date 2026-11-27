@@ -1,0 +1,134 @@
+@model DetallePedidoVM
+@{
+    var pedido = Model.Pedido;
+    var codigo = pedido.Codigo ?? $"#{pedido.Id_Pedido}";
+    var siguiente = pedido.Situacion switch { EstadoPedido.Confirmado => EstadoPedido.EnPreparacion, EstadoPedido.EnPreparacion => EstadoPedido.ListoRecojo, EstadoPedido.ListoRecojo => EstadoPedido.Retirado, _ => (EstadoPedido?)null };
+    ViewData["Title"] = "Pedido " + codigo;
+    var consultaWhatsApp = "https://wa.me/" + Model.Ajustes.WhatsApp + "?text=" + Uri.EscapeDataString("Hola, quisiera consultar por mi pedido " + codigo + ".");
+}
+<section class="marco pagina">
+    <a class="regreso" asp-controller="@(Model.Personal ? "Operacion" : "Pedidos")" asp-action="Index">← Volver a @(Model.Personal ? "operación" : "mis pedidos")</a>
+    <div class="seccion-cabecera cabecera-pedido">
+        <div><h1>@codigo</h1><p>Registrado el @pedido.Fecha.ToString("dd/MM/yyyy")</p></div>
+        <span class="estado">@pedido.Situacion.Etiqueta()</span>
+    </div>
+    <div class="dos-columnas">
+        <div class="apilado">
+            <section class="panel">
+                <h2>Detalle</h2>
+                @if (Model.Personal) { <p><strong>@pedido.Usuarios.Nombre</strong><br />@pedido.Usuarios.Correo · @pedido.Usuarios.Telefono</p> }
+                @foreach (var linea in pedido.DetallePedidos)
+                {
+                    <div class="linea-pedido"><span>@linea.Cantidad × @(linea.NombreHistorico == "" ? linea.Productos.Nombre : linea.NombreHistorico)
+                    @if (linea.GrupoCombo != null) { <small>@linea.GrupoCombo</small> }</span><strong>S/ @linea.Subtotal.ToString("0.00")</strong></div>
+                }
+                <div class="total"><span>Total</span><strong>S/ @pedido.Total.ToString("0.00")</strong></div>
+            </section>
+            <section class="panel" id="consultas">
+                <h2>Consultas</h2>
+                @if (pedido.Consultas.Count == 0) { <p>Todavía no hay consultas sobre este pedido.</p> }
+                @foreach (var consulta in pedido.Consultas.OrderBy(c => c.Creada))
+                {
+                    <article class="consulta">
+                        <p><strong>@RelojTienda.EnLima(consulta.Creada).ToString("dd/MM/yyyy HH:mm")</strong></p><p>@consulta.Pregunta</p>
+                        @if (consulta.Respuesta != null) { <p class="respuesta"><strong>Respuesta</strong><br />@consulta.Respuesta <small>@(consulta.Respondida is { } respondida ? RelojTienda.EnLima(respondida).ToString("dd/MM/yyyy HH:mm") : "")</small></p> }
+                        else if (Model.Personal)
+                        {
+                            <form asp-controller="Operacion" asp-action="Responder" asp-route-id="@pedido.Id_Pedido" class="formulario" method="post">
+                                <input type="hidden" name="consulta" value="@consulta.Id" />
+                                <label for="respuesta-@consulta.Id">Responder consulta</label>
+                                <textarea id="respuesta-@consulta.Id" name="respuesta" required maxlength="1000"></textarea>
+                                <button class="boton boton-secundario" type="submit">Enviar respuesta</button>
+                            </form>
+                        }
+                    </article>
+                }
+                @if (!Model.Personal)
+                {
+                    <form asp-action="Consultar" asp-route-id="@pedido.Id_Pedido" class="formulario" method="post">
+                        <label for="pregunta">Escribe tu consulta</label><textarea id="pregunta" name="pregunta" maxlength="1000" required></textarea>
+                        <button class="boton boton-secundario" type="submit">Enviar consulta</button>
+                    </form>
+                    @if (!string.IsNullOrWhiteSpace(Model.Ajustes.WhatsApp))
+                    {
+                        <a class="enlace-flecha" href="@consultaWhatsApp" target="_blank" rel="noopener noreferrer">Consultar por WhatsApp ↗</a>
+                    }
+                }
+            </section>
+        </div>
+        <div class="apilado">
+            <section class="panel resumen">
+                <h2>Pago por Yape</h2>
+                @if (pedido.Situacion == EstadoPedido.PendientePago && !Model.Personal)
+                {
+                    @if (string.IsNullOrWhiteSpace(Model.Ajustes.Yape)) { <p>Consulta con el negocio antes de enviar un pago.</p> }
+                    else
+                    {
+                        <p>Yapea <strong>S/ @pedido.Total.ToString("0.00")</strong> al número del negocio.</p>
+                        <p class="numero-yape">@Model.Ajustes.Yape</p>
+                        @if (!string.IsNullOrWhiteSpace(Model.Ajustes.TitularYape)) { <p>Titular: @Model.Ajustes.TitularYape</p> }
+                        <p>Registra el código de operación o adjunta el comprobante. El personal revisará el abono.</p>
+                        <form asp-action="Pago" asp-route-id="@pedido.Id_Pedido" enctype="multipart/form-data" method="post" class="formulario">
+                            <label for="Referencia">Código de operación</label><input name="Referencia" id="Referencia" maxlength="40" />
+                            <label for="Monto">Importe pagado (S/)</label><input name="Monto" id="Monto" type="number" step="0.01" min="0.01" value="@pedido.Total.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)" required />
+                            <label for="Fecha">Fecha del pago</label><input id="Fecha" name="Fecha" type="date" value="@RelojTienda.Hoy.ToString("yyyy-MM-dd")" required />
+                            <label for="Evidencia">Comprobante (JPG, PNG o PDF, hasta 5 MB)</label><input id="Evidencia" name="Evidencia" type="file" accept=".jpg,.jpeg,.png,.pdf" />
+                            <button class="boton boton-primario" type="submit">Enviar a revisión ↗</button>
+                        </form>
+                    }
+                }
+                @if (Model.Pagos.Count == 0 && (Model.Personal || pedido.Situacion != EstadoPedido.PendientePago)) { <p>Aún no hay un pago registrado.</p> }
+                @foreach (var pago in Model.Pagos)
+                {
+                    <article class="intento">
+                        <p><strong>@pago.Estado.Etiqueta()</strong> · @pago.Fecha.ToString("dd/MM/yyyy") · S/ @pago.Total.ToString("0.00")</p>
+                        @if (pago.Referencia != null) { <p>Código de operación: @pago.Referencia</p> }
+                        @if (pago.Motivo != null) { <p>@pago.Motivo</p> }
+                        @if (pago.Evidencia) { <a asp-action="Evidencia" asp-route-id="@pago.Id" class="subrayado">Descargar comprobante</a> }
+                        @if (Model.Personal && pago.Estado == EstadoPago.PendienteRevision)
+                        {
+                            <form asp-controller="Operacion" asp-action="Revisar" asp-route-id="@pedido.Id_Pedido" method="post" class="formulario">
+                                <input type="hidden" name="pago" value="@pago.Id" />
+                                <label class="casilla"><input type="checkbox" name="recepcionConfirmada" value="true" /><span>Contrasté que se recibió la operación y el importe en Yape.</span></label>
+                                <label for="motivo-pago-@pago.Id">Motivo si rechazas</label><input id="motivo-pago-@pago.Id" name="motivo" maxlength="200" />
+                                <div class="acciones"><button class="boton boton-primario" type="submit" name="aprobar" value="true">Verificar</button><button class="boton boton-secundario" type="submit" name="aprobar" value="false">Rechazar</button></div>
+                            </form>
+                        }
+                    </article>
+                }
+            </section>
+            <section class="panel">
+                <h2>Recojo en el local</h2>
+                <p>@Model.Ajustes.Direccion<br />@Model.Ajustes.Horario</p>
+                <p>Presenta el código del pedido y tu documento al recogerlo.</p>
+                @if (Model.Personal && siguiente != null)
+                {
+                    <form asp-controller="Operacion" asp-action="Avanzar" asp-route-id="@pedido.Id_Pedido" method="post" class="formulario">
+                        <input type="hidden" name="estado" value="@siguiente" />
+                        @if (siguiente == EstadoPedido.Retirado) { <label class="casilla"><input type="checkbox" name="identidadVerificada" value="true" required /><span>Verifiqué la identidad y la mayoría de edad.</span></label> }
+                        <button class="boton boton-primario" type="submit">@(siguiente == EstadoPedido.Retirado ? "Registrar recojo" : siguiente == EstadoPedido.EnPreparacion ? "Empezar a preparar" : "Marcar listo para recoger") ↗</button>
+                    </form>
+                }
+                @if (Model.Personal && pedido.Situacion is EstadoPedido.PendientePago or EstadoPedido.EnRevision)
+                {
+                    <details><summary>Cancelar pedido impago</summary>
+                        <form asp-controller="Operacion" asp-action="Avanzar" asp-route-id="@pedido.Id_Pedido" method="post" class="formulario">
+                            <input type="hidden" name="estado" value="@EstadoPedido.Cancelado" /><label for="motivo-cancelar">Motivo de cancelación</label>
+                            <input id="motivo-cancelar" name="motivo" maxlength="200" required /><button class="boton boton-secundario" type="submit">Cancelar y liberar stock</button>
+                        </form>
+                    </details>
+                }
+            </section>
+            <section class="panel">
+                <h2>Seguimiento</h2>
+                @if (pedido.Historial.Count == 0) { <p>No hay movimientos registrados.</p> }
+                <ol class="historial">
+                    @foreach (var evento in pedido.Historial.OrderByDescending(e => e.Fecha))
+                    {
+                        <li><time datetime="@evento.Fecha.ToString("O")">@RelojTienda.EnLima(evento.Fecha).ToString("dd/MM/yyyy HH:mm")</time>@evento.Descripcion</li>
+                    }
+                </ol>
+            </section>
+        </div>
+    </div>
+</section>

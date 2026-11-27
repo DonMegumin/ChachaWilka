@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ChachaWilka.Models
@@ -12,9 +12,9 @@ namespace ChachaWilka.Models
         public int Cantidad { get; set; }
         //DetalleCombo M:1 Combo
         public int Id_Combo { get; set; }
-        public Combo Combos { get; set; }
+        public Combo Combos { get; set; } = null!;
         //DetalleCombo M:1 Producto
         public int Id_Producto { get; set; }
-        public Producto Productos { get; set; }
+        public Producto Productos { get; set; } = null!;
     }
 }
