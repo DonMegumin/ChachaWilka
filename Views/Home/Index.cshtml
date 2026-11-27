@@ -9,29 +9,59 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - ChachaWilka</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@1&family=Playfair+Display:ital,wght@0,900;1,400&family=Space+Mono&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
 </head>
-<body>
-    <div class="d-flex justify-content-end p-3">
-        @if (autenticado)
-        {
-            <form asp-controller="Login" asp-action="Logout" method="post" class="d-flex align-items-center gap-2">
+<body class="cw-home">
+    <section class="cw-hero">
+
+        <!-- Iniciar sesión / Cerrar sesión -->
+        <div class="cw-login">
+            @if (autenticado)
+            {
                 <span>@User.Identity!.Name</span>
-                <button type="submit" class="btn btn-outline-dark btn-sm">Cerrar sesión</button>
-            </form>
-        }
-        else
-        {
-            <a asp-controller="Login" asp-action="Login" class="btn btn-outline-dark btn-sm">Iniciar sesión</a>
-        }
-    </div>
+                <form asp-controller="Login" asp-action="Logout" method="post">
+                    <button type="submit" class="cw-boton">Cerrar sesión</button>
+                </form>
+            }
+            else
+            {
+                <a asp-controller="Login" asp-action="Login" class="cw-boton">Iniciar sesión</a>
+            }
+        </div>
 
-    <main class="container text-center py-5">
-        <p class="text-uppercase small mb-2">Licores y Cremas</p>
-        <h1 class="display-1 mb-3"><strong>Chacha</strong><em>Willka</em></h1>
-        <p class="fst-italic fs-4">El sabor tradicional, guardado en cada botella.</p>
-    </main>
+        <div class="cw-contenido">
+            <!-- Botella -->
+            <svg class="cw-botella" viewBox="0 0 46 112" fill="none" stroke="#3b342b" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                <circle cx="23" cy="9" r="7" />
+                <path d="M17 14 C17 20 8 22 8 30 V100 a8 8 0 0 0 8 8 H30 a8 8 0 0 0 8 -8 V30 C38 22 29 20 29 14" />
+                <line x1="15" y1="38" x2="31" y2="38" />
+                <line x1="15" y1="57" x2="31" y2="57" />
+                <line x1="15" y1="76" x2="31" y2="76" />
+            </svg>
 
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+            <p class="cw-etiqueta">Licores y Cremas</p>
+            <h1 class="cw-titulo">Chacha<em>Willka</em></h1>
+            <p class="cw-lema">El sabor tradicional, guardado en cada botella.</p>
+
+            <!-- Rombos -->
+            <div class="cw-rombos" aria-hidden="true">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+
+            <a href="#coleccion" class="cw-boton">Ver la colección ↓</a>
+        </div>
+
+        <!-- Montañas -->
+        <svg class="cw-montanas" viewBox="0 430 1526 315" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+            <polygon class="m1" points="0,540 100,590 250,467 420,590 565,438 740,540 885,480 1040,580 1213,460 1380,565 1526,510 1526,745 0,745" />
+            <polygon class="m2" points="0,610 55,567 168,692 365,538 450,678 690,581 745,692 1015,567 1043,678 1355,595 1500,660 1526,665 1526,745 0,745" />
+            <polygon class="m3" points="0,650 42,623 165,690 310,595 450,680 605,637 750,690 902,608 1045,680 1200,645 1355,700 1526,652 1526,745 0,745" />
+        </svg>
+    </section>
+
+    <section id="coleccion"></section>
 </body>
 </html>
