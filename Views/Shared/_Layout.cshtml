@@ -10,6 +10,7 @@
 <html lang="es-PE" data-type="@(portada ? "product" : null)">
 <head>
     <meta charset="utf-8" />
+    <script src="~/js/tema.js" asp-append-version="true"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#12251d" />
     <meta name="description" content="Descubre la colección de licores y cremas artesanales de ChachaWillka. Haz tu pedido para recojo en Chachapoyas." />
@@ -23,6 +24,7 @@
         <link rel="stylesheet" href="~/css/escaparate.css" asp-append-version="true" />
         <script src="~/js/escaparate.js" asp-append-version="true" defer></script>
     }
+    <link rel="stylesheet" href="~/css/tema.css" asp-append-version="true" />
     <script src="~/js/site.js" asp-append-version="true" defer></script>
 </head>
 <body class="@(portada ? "es-portada" : "") @(personal && !portada ? "es-personal" : "")">
@@ -51,6 +53,7 @@
                 }
             </nav>
             <div class="cuenta-nav">
+                <button type="button" class="tema-control" data-tema aria-pressed="false">Modo oscuro</button>
                 <button type="button" class="menu-movil" aria-expanded="false" aria-controls="menu-principal" hidden>Menú</button>
                 @if (User.Identity?.IsAuthenticated == true)
                 {

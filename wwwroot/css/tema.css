@@ -1,0 +1,14 @@
+.tema-control { border: 1px solid currentColor; border-radius: 999px; background: transparent; color: inherit; padding: .42rem .7rem; font-size: .8rem; font-weight: 700; white-space: nowrap; }
+.tema-control:hover { opacity: .8; }
+html[data-tema="oscuro"] { color-scheme: dark; --ink: #edf3e9; --acento-tinta: #f1c681; --cream: #101b16; --white: #1b2a22; --paper: #26382d; --pale: #26382d; --line: #475a4c; --muted: #bdcbbd; --wine: #204b3c; --wine-soft: #35694f; }
+html[data-tema="oscuro"] .es-personal { --cream: #101b16; --paper: #26382d; --pale: #26382d; }
+html[data-tema="oscuro"] .cabecera { background: #14241df2; color: #edf3e9; border-bottom: 1px solid var(--line); }
+html[data-tema="oscuro"] .es-personal .cabecera, html[data-tema="oscuro"] .pie { background: #10231a; color: #edf3e9; }
+html[data-tema="oscuro"] .boton-primario, html[data-tema="oscuro"] .filtros a[aria-current], html[data-tema="oscuro"] .elegido .elegir-signo, html[data-tema="oscuro"] .boton-redondo:hover { color: #fff; }
+html[data-tema="oscuro"] .cajas { color: #edf3e9; }
+html[data-tema="oscuro"] .detalle-categoria, html[data-tema="oscuro"] .visita h2 em { color: #c7d8b4; }
+html[data-tema="oscuro"] .cerrar-ficha, html[data-tema="oscuro"] .abrir-ficha .flecha { background: #26382d; color: #edf3e9; }
+html[data-tema="oscuro"] .es-personal tbody tr:hover { background: #31483a; }
+html[data-tema="oscuro"] .estado { color: #17251b; }
+html[data-tema="oscuro"] .validacion { color: #ffb5a4; }
+html[data-tema="oscuro"] .escena-selector [aria-pressed=true] { color: #162b23; }
