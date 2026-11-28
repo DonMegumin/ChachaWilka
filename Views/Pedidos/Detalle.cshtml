@@ -3,6 +3,11 @@
     var pedido = Model.Pedido;
     var codigo = pedido.Codigo ?? $"#{pedido.Id_Pedido}";
     var siguiente = pedido.Situacion switch { EstadoPedido.Confirmado => EstadoPedido.EnPreparacion, EstadoPedido.EnPreparacion => EstadoPedido.ListoRecojo, EstadoPedido.ListoRecojo => EstadoPedido.Retirado, _ => (EstadoPedido?)null };
+    var recorrido = new[] {
+        EstadoPedido.PendientePago, EstadoPedido.EnRevision, EstadoPedido.Confirmado,
+        EstadoPedido.EnPreparacion, EstadoPedido.ListoRecojo, EstadoPedido.Retirado
+    };
+    var pasoActual = Array.IndexOf(recorrido, pedido.Situacion);
     ViewData["Title"] = "Pedido " + codigo;
     var consultaWhatsApp = "https://wa.me/" + Model.Ajustes.WhatsApp + "?text=" + Uri.EscapeDataString("Hola, quisiera consultar por mi pedido " + codigo + ".");
 }
@@ -10,8 +15,19 @@
     <a class="regreso" asp-controller="@(Model.Personal ? "Operacion" : "Pedidos")" asp-action="Index">← Volver a @(Model.Personal ? "operación" : "mis pedidos")</a>
     <div class="seccion-cabecera cabecera-pedido">
         <div><h1>@codigo</h1><p>Registrado el @pedido.Fecha.ToString("dd/MM/yyyy")</p></div>
-        <span class="estado">@pedido.Situacion.Etiqueta()</span>
+        <span class="estado" data-estado="@pedido.Situacion">@pedido.Situacion.Etiqueta()</span>
     </div>
+    @if (pasoActual >= 0)
+    {
+        <ol class="ruta-pedido" aria-label="Progreso del pedido">
+            @for (var i = 0; i < recorrido.Length; i++)
+            {
+                <li class="@(i < pasoActual ? "paso-completo" : null)" aria-current="@(i == pasoActual ? "step" : null)">
+                    <span>@recorrido[i].Etiqueta()</span>
+                </li>
+            }
+        </ol>
+    }
     <div class="dos-columnas">
         <div class="apilado">
             <section class="panel">

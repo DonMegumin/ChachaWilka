@@ -4,15 +4,15 @@
     var seleccion = Model.Carrito.Seleccion;
     var puedeComprar = User.IsInRole(RolesTienda.Cliente);
 }
-<section class="marco pagina">
-    <a class="regreso" asp-controller="Home" asp-action="Index" asp-fragment="coleccion">← Seguir explorando</a>
+<section class="marco pagina pagina-cesta">
+    <a class="regreso" asp-controller="Home" asp-action="Coleccion">← Seguir explorando</a>
     <h1>Tu cesta</h1>
     @if (Model.Carrito.Cantidad == 0)
     {
         <div class="cesta-vacia">
             <img src="~/images/chachawillka/combo-licores-2.jpg" alt="La colección de licores ChachaWillka" width="640" height="383" />
             <div><h2>Tu cesta está vacía.</h2><p>Elige un licor, una crema o arma tu propia caja.</p>
-            <a class="boton boton-primario" asp-controller="Home" asp-action="Index" asp-fragment="coleccion">Ir a la colección <span aria-hidden="true">↗</span></a></div>
+            <a class="boton boton-primario" asp-controller="Home" asp-action="Coleccion">Ir a la colección <span aria-hidden="true">↗</span></a></div>
         </div>
     }
     else
@@ -25,6 +25,10 @@
                 {
                     var linea = Model.Carrito.Lineas.FirstOrDefault(l => l.Combo == null && l.Producto.Id_Producto == par.Key);
                     <article class="linea-cesta">
+                        @if (linea?.Producto.Imagen is { Length: > 0 } foto)
+                        {
+                            <img class="cesta-miniatura" src="~/images/chachawillka/@foto" alt="" width="640" height="585" loading="lazy" />
+                        }
                         <div><h3>@(linea?.Producto.Nombre ?? "Producto fuera de catálogo")</h3>
                         @if (linea != null) { <p>S/ @linea.Precio.ToString("0.00") por unidad</p> }</div>
                         @if (linea != null)
@@ -44,6 +48,8 @@
                 @foreach (var combo in seleccion.Combos)
                 {
                     <article class="linea-cesta">
+                        <img class="cesta-miniatura" src="~/images/chachawillka/@(combo.Categoria == CatalogoMarca.Cremas ? "caja-cremas.webp" : "caja-licores.webp")"
+                             alt="" width="1200" height="800" loading="lazy" />
                         <div><h3>Caja de @combo.Categoria.ToLowerInvariant()</h3>
                         <p>@string.Join(", ", combo.Sabores.Select(id => Model.Carrito.Lineas.FirstOrDefault(l => l.Producto.Id_Producto == id)?.Producto.Nombre ?? "Sabor no disponible"))</p></div>
                         <form asp-action="Quitar" method="post">
@@ -53,7 +59,7 @@
                     </article>
                 }
             </div>
-            <aside class="panel resumen">
+            <aside class="panel resumen resumen-cesta">
                 <h2>Resumen</h2>
                 <p>@Model.Carrito.Cantidad unidades · Recojo en el local</p>
                 <p>@Model.Ajustes.Direccion<br />@Model.Ajustes.Horario</p>

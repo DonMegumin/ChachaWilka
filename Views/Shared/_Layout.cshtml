@@ -1,37 +1,37 @@
 @inject CarritoTienda Carrito
 @{
     var portada = ViewData["Portada"] is true;
+    var catalogo = ViewData["Catalogo"] is true;
     var personal = User.IsInRole(RolesTienda.Administrador) || User.IsInRole(RolesTienda.Empleado);
     var cesta = Carrito.Leer(Context.Session);
     var cantidad = cesta.Botellas.Values.Sum() + cesta.Combos.Count * 4;
 }
 <!DOCTYPE html>
-<html lang="es-PE">
+<html lang="es-PE" data-type="@(portada ? "product" : null)">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#14251f" />
+    <meta name="theme-color" content="#12251d" />
     <meta name="description" content="Descubre la colección de licores y cremas artesanales de ChachaWillka. Haz tu pedido para recojo en Chachapoyas." />
     <title>@ViewData["Title"] — ChachaWillka</title>
     <link rel="icon" type="image/jpeg" href="~/images/chachawillka/instagram-perfil.jpg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&amp;display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    @if (portada)
+    @if (portada || catalogo)
     {
+        <meta name="page-type" content="product" />
+        <meta name="site-kind" content="other" />
         <link rel="stylesheet" href="~/css/escaparate.css" asp-append-version="true" />
         <script src="~/js/escaparate.js" asp-append-version="true" defer></script>
     }
     <script src="~/js/site.js" asp-append-version="true" defer></script>
 </head>
-<body class="@(portada ? "es-portada" : "")">
+<body class="@(portada ? "es-portada" : "") @(personal && !portada ? "es-personal" : "")">
     <a class="skip" href="#contenido">Saltar al contenido</a>
     <header class="cabecera">
         <div class="marco cabecera-interior">
             <a class="marca" asp-controller="Home" asp-action="Index" aria-label="ChachaWillka, inicio">Chacha<i>Willka</i><span>.</span></a>
             <nav class="navegacion" id="menu-principal" aria-label="Navegación principal">
-                <a asp-controller="Home" asp-action="Index" asp-fragment="coleccion">Colección</a>
+                <a asp-controller="Home" asp-action="Coleccion">Colección</a>
                 @if (!personal)
                 {
                     <a class="nav-cajas" asp-controller="Home" asp-action="Index" asp-fragment="cajas">Cajas</a>
@@ -63,11 +63,24 @@
                 }
                 @if (!personal)
                 {
-                    <a class="cesta-nav" asp-controller="Cesta" asp-action="Index">Cesta <span>@cantidad</span></a>
+                    <a class="cesta-nav" data-bolsa-url="@Url.Action("VistaRapida", "Cesta")" asp-controller="Cesta" asp-action="Index"><svg aria-hidden="true" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 8h14l1 13H4L5 8Z M9 9V6a3 3 0 0 1 6 0v3" /></svg> Cesta <span>@cantidad</span></a>
                 }
             </div>
         </div>
     </header>
+    @if (personal && !portada && !catalogo)
+    {
+        <nav class="nav-personal" aria-label="Área de personal"><div class="marco">
+            @if (User.IsInRole(RolesTienda.Administrador))
+            {
+                <a asp-controller="Administracion" asp-action="Catalogo">Inventario</a>
+                <a asp-controller="Administracion" asp-action="Usuarios">Cuentas</a>
+                <a asp-controller="Administracion" asp-action="Reportes">Reportes</a>
+                <a asp-controller="Administracion" asp-action="Ajustes">Ajustes</a>
+            }
+            <a asp-controller="Operacion" asp-action="Index">Pedidos del local</a>
+        </div></nav>
+    }
     <main id="contenido">
         @if (TempData["Aviso"] is string aviso)
         {
@@ -79,6 +92,15 @@
         }
         @RenderBody()
     </main>
+    @if (!personal)
+    {
+        <dialog class="bolsa" data-bolsa aria-labelledby="titulo-bolsa">
+            <header><h2 id="titulo-bolsa">Tu cesta</h2><form method="dialog"><button class="cerrar-capa" aria-label="Cerrar cesta" autofocus>×</button></form></header>
+            <p class="bolsa-aviso" role="status"></p>
+            <div data-bolsa-contenido></div>
+            <a class="bolsa-enlace" asp-controller="Cesta" asp-action="Index">Abrir página de la cesta</a>
+        </dialog>
+    }
     <footer class="pie">
         <div class="marco pie-interior">
             <div><a class="marca" asp-controller="Home" asp-action="Index">Chacha<i>Willka</i><span>.</span></a><p>Licores y cremas artesanales · Chachapoyas</p></div>

@@ -11,6 +11,10 @@ namespace ChachaWilka.Controllers;
 
 public class CestaController(AppDbContext db, CarritoTienda carrito, PedidosTienda pedidos) : Controller
 {
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    public async Task<IActionResult> VistaRapida() =>
+        PartialView("_VistaRapida", await carrito.CalcularAsync(carrito.Leer(HttpContext.Session)));
+
     public async Task<IActionResult> Index()
     {
         var seleccion = carrito.Leer(HttpContext.Session);
@@ -28,17 +32,18 @@ public class CestaController(AppDbContext db, CarritoTienda carrito, PedidosTien
     }
 
     [HttpPost]
-    public async Task<IActionResult> Agregar(int id, string? categoria)
+    public async Task<IActionResult> Agregar(int id, string? categoria, bool vistaRapida = false)
     {
         var seleccion = carrito.Leer(HttpContext.Session);
         var nuevaCantidad = seleccion.Botellas.GetValueOrDefault(id) + 1;
         if (nuevaCantidad > 99 || seleccion.Botellas.Count >= 40 && !seleccion.Botellas.ContainsKey(id))
-            return Aviso("Llegaste al límite de unidades de la cesta.", () => Coleccion(categoria));
+            return ErrorAgregar("Llegaste al límite de unidades de la cesta.", categoria, vistaRapida);
         seleccion.Botellas[id] = nuevaCantidad;
         var calculado = await carrito.CalcularAsync(seleccion);
         if (calculado.Errores.Count > 0)
-            return Aviso(calculado.Errores[0], () => Coleccion(categoria));
+            return ErrorAgregar(calculado.Errores[0], categoria, vistaRapida);
         carrito.Guardar(HttpContext.Session, seleccion);
+        if (vistaRapida) return PartialView("_VistaRapida", calculado);
         TempData["Aviso"] = "Añadido a tu cesta.";
         return Coleccion(categoria);
     }
@@ -106,8 +111,11 @@ public class CestaController(AppDbContext db, CarritoTienda carrito, PedidosTien
         }
     }
 
+    private IActionResult ErrorAgregar(string mensaje, string? categoria, bool vistaRapida) =>
+        vistaRapida ? Conflict(new { mensaje }) : Aviso(mensaje, () => Coleccion(categoria));
+
     private IActionResult Coleccion(string? categoria) =>
-        RedirectToAction("Index", "Home", new { categoria }, "coleccion");
+        RedirectToAction("Coleccion", "Home", new { categoria }, "coleccion");
 
     private IActionResult Aviso(string mensaje, Func<IActionResult> destino)
     {
