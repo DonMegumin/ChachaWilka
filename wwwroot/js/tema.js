@@ -3,7 +3,7 @@
     try { tema = localStorage.getItem('chachawillka-tema') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'oscuro' : 'claro'); } catch { }
     document.documentElement.dataset.tema = tema;
     document.addEventListener('DOMContentLoaded', () => {
-        const boton = document.querySelector('[data-tema]');
+        const boton = document.querySelector('button[data-tema]');
         if (!boton) return;
         const actualizar = () => {
             const oscuro = document.documentElement.dataset.tema === 'oscuro';
